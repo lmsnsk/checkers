@@ -1,0 +1,15 @@
+.cell {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.black {
+  background-color: black;
+}
+
+.white {
+  background-color: rgb(241, 160, 106);
+}
