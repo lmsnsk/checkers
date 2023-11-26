@@ -1,21 +1,21 @@
+import { BoardCellI } from "./BoardComponent";
 import style from "./Cell.module.css";
 
-const CellComponent: React.FC = () => {
-  const cellsCreator = (): Array<React.ReactElement> => {
-    const cellArray: Array<React.ReactElement> = [];
-    for (let i = 0; i < 8; i++) {
-      let k: number = i % 2 ? 0 : 1;
-      for (let j = k; j < k + 8; j++) {
-        cellArray.push(
-          <div
-            className={`${j % 2 ? style.black : style.white} ${style.cell}`}
-          ></div>
-        );
-      }
-    }
-    return cellArray;
+interface CellComponentI {
+  board: BoardCellI;
+  setBoard: React.Dispatch<React.SetStateAction<BoardCellI[][]>>;
+}
+
+const CellComponent: React.FC<CellComponentI> = ({ board, setBoard }) => {
+  const cellCreator = () => {
+    const styleLine =
+      board.x % 2
+        ? `${board.y % 2 ? style.black : style.white} ${style.cell}`
+        : `${board.y % 2 ? style.white : style.black} ${style.cell}`;
+    return <div className={styleLine}></div>;
   };
-  return <>{cellsCreator()}</>;
+
+  return cellCreator();
 };
 
 export default CellComponent;
