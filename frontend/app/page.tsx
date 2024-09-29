@@ -32,6 +32,8 @@ export default function Home() {
     socket.onmessage = (e) => {
       const data = JSON.parse(e.data);
 
+      console.log(data);
+
       if (data.action === "create_room") {
         setRoomlist(
           data.rooms.map((room: any) => ({

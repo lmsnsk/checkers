@@ -23,16 +23,14 @@ export const LowerButtons: FC<LowerButtonsProps> = ({
   const createRoomHandler = () => {
     if (inputNickname) {
       send(inputNickname);
-      window.location.pathname = "/room/";
+      // window.location.pathname = "/room/";
     }
   };
 
   const joinRoomHandler = () => {
-    console.log("inputNickname: ", inputNickname, "chosenRoom: ", chosenRoom);
-
     if (inputNickname && chosenRoom) {
       join(inputNickname, chosenRoom);
-      window.location.pathname = "/room/";
+      // window.location.pathname = "/room/";
     }
   };
 
