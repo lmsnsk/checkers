@@ -34,14 +34,19 @@ export default function Home() {
 
       console.log(data);
 
-      if (data.action === "create_room") {
-        setRoomlist(
-          data.rooms.map((room: any) => ({
-            id: room.id,
-            name: room.name,
-            players: room.players.length,
-          }))
-        );
+      switch (data.action) {
+        case "create_room":
+          setRoomlist(
+            data.rooms.map((room: any) => ({
+              id: room.id,
+              name: room.name,
+              players: room.players.length,
+            }))
+          );
+          break;
+        case "to_room":
+          window.location.pathname = "/room/";
+          break;
       }
     };
   }

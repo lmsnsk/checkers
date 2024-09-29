@@ -61,10 +61,24 @@ connection.on("connection", (ws) => {
       case "create_room":
         createRoom(data.nickname, ws);
         sendAllUsersRoomList();
+        ws.send(
+          JSON.stringify({
+            action: "to_room",
+            nickname: data.nickname,
+            id: data.id,
+          })
+        );
         break;
       case "join_room":
         if (joinRoom(data.nickname, data.id, ws)) {
           sendAllUsersRoomList();
+          ws.send(
+            JSON.stringify({
+              action: "to_room",
+              nickname: data.nickname,
+              id: data.id,
+            })
+          );
         }
         break;
     }
