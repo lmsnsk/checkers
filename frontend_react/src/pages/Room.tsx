@@ -77,7 +77,7 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
             <>
               {title()}
               <Field fieldSize={fieldSize} />
-              <div className={`${style.chatBox} ${isChatOpened ? style.vertiCalchatBox : ""}`}>
+              <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
                   nickname={nickname}
                   roomChat={roomChat}
@@ -93,6 +93,7 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
           ) : (
             <>
               <div>
+                {title()}
                 <Chat
                   nickname={nickname}
                   roomChat={roomChat}
