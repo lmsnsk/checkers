@@ -1,26 +1,42 @@
 import { FC, useEffect, useState } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 
-import style from "./App.module.scss";
+// import style from "./App.module.scss";
 
 import Lobby from "./pages/Lobby";
 import Room from "./pages/Room";
 import { useSocket } from "./lib/hooks";
 
+export interface RoomChat {
+  text: string;
+  nickname: string;
+  date: string;
+}
+
 const App: FC = () => {
   const [roomList, setRoomlist] = useState<any>([]);
+  const [roomChat, setRoomChat] = useState<RoomChat[]>([]);
+  const [nickname, setNickname] = useState("");
+
+  const navigate = useNavigate();
 
   const socket: WebSocket | null = useSocket();
 
-  const send = (nickname: string) => {
+  const createRoom = (nickname: string) => {
     if (socket) {
       socket.send(JSON.stringify({ action: "create_room", nickname, piece_type: "white" }));
     }
   };
 
-  const join = (nickname: string, id: number) => {
+  const joinRoom = (nickname: string, id: number) => {
     if (socket) {
       socket.send(JSON.stringify({ action: "join_room", nickname, id }));
+    }
+  };
+
+  const sendChatMessage = (text: string) => {
+    if (socket) {
+      socket.send(JSON.stringify({ action: "chat_message", text, nickname }));
     }
   };
 
@@ -41,7 +57,11 @@ const App: FC = () => {
           );
           break;
         case "to_room":
-          window.location.pathname = "/room/";
+          setNickname(data.nickname);
+          navigate("/room");
+          break;
+        case "chat_message":
+          setRoomChat(data.chat);
           break;
       }
     };
@@ -61,8 +81,14 @@ const App: FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Lobby send={send} join={join} roomList={roomList} />} />
-      <Route path="/room" element={<Room />} />
+      <Route
+        path="/"
+        element={<Lobby createRoom={createRoom} joinRoom={joinRoom} roomList={roomList} />}
+      />
+      <Route
+        path="/room"
+        element={<Room nickname={nickname} roomChat={roomChat} sendChatMessage={sendChatMessage} />}
+      />
     </Routes>
   );
 };

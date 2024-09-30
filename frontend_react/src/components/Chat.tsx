@@ -3,50 +3,26 @@ import EmojiPicker from "emoji-picker-react";
 
 import style from "./Chat.module.scss";
 
-import { useSocket } from "../lib/hooks";
 import MessagesList from "./MessagesList";
 import emojiImg from "../assets/img/emoji.png";
 import sendImg from "../assets/img/send.png";
+import { RoomChat } from "../App";
 
 interface ChatProps {
+  nickname: string;
+  roomChat: RoomChat[];
   fieldSize: number;
   isVertical: boolean;
+  sendChatMessage: (text: string) => void;
 }
 
-const messages = [
-  { text: "Привет", date: "12:00", sender: "Me" },
-  { text: "Привет!", date: "12:01", sender: "Ken" },
-  { text: "Чо, как оно?", date: "12:02", sender: "Me" },
-  { text: "Да норм😁", date: "12:03", sender: "Ken" },
-];
-
-const Chat: FC<ChatProps> = ({ fieldSize, isVertical }) => {
+const Chat: FC<ChatProps> = ({ nickname, roomChat, fieldSize, isVertical, sendChatMessage }) => {
   const [inputMessage, setInputMessage] = useState("");
-  const [messageList, setMessageList] = useState(messages);
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   const messageListRef = useRef<HTMLDivElement | null>(null);
-
-  const socket = useSocket();
-
-  const send = (inputMessage: string) => {
-    if (socket) {
-      socket.send(
-        JSON.stringify({
-          action: "send_message",
-          room_id: "0",
-          sender: "333",
-          content: inputMessage,
-        })
-      );
-    }
-  };
-
-  if (socket) {
-    socket.onmessage = (e) => console.log(JSON.parse(e.data));
-  }
 
   useEffect(() => {
     const listenerHandler = () => {
@@ -61,20 +37,8 @@ const Chat: FC<ChatProps> = ({ fieldSize, isVertical }) => {
 
   const sendMessage = () => {
     if (inputMessage) {
-      send(inputMessage);
+      sendChatMessage(inputMessage);
       setIsEmojiOpen(false);
-
-      setMessageList([
-        ...messageList,
-        {
-          text: inputMessage,
-          date: new Date().toLocaleTimeString("ru", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          sender: "Me",
-        },
-      ]);
       setInputMessage("");
       setTimeout(() => {
         messageListRef.current?.scrollTo({
@@ -102,7 +66,7 @@ const Chat: FC<ChatProps> = ({ fieldSize, isVertical }) => {
       </div>
       <div className={style.windowBox}>
         <div ref={messageListRef} className={style.window}>
-          <MessagesList messageList={messageList} />
+          <MessagesList nickname={nickname} roomChat={roomChat} />
         </div>
         <div className={style.underWindow}>
           <input

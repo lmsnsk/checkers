@@ -44,12 +44,12 @@ export interface IListItem {
 
 interface RoomsListProps {
   isMobile: boolean;
-  send: (nickname: string) => void;
-  join: (nickname: string, id: number) => void;
+  createRoom: (nickname: string) => void;
+  joinRoom: (nickname: string, id: number) => void;
   roomList: IListItem[];
 }
 
-const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, join, send }) => {
+const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, joinRoom, createRoom }) => {
   const [chosenRoom, setChosenRoom] = useState(0);
 
   return (
@@ -77,7 +77,12 @@ const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, join, send }) => {
           ))}
         </div>
       </div>
-      <LowerButtons chosenRoom={chosenRoom} isMobile={isMobile} send={send} join={join} />
+      <LowerButtons
+        chosenRoom={chosenRoom}
+        isMobile={isMobile}
+        createRoom={createRoom}
+        joinRoom={joinRoom}
+      />
     </>
   );
 };

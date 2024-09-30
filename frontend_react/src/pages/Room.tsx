@@ -6,8 +6,15 @@ import Chat from "../components/Chat";
 import Field from "../components/Field";
 import chatImg from "../assets/img/chat.png";
 import backImg from "../assets/img/back.png";
+import { RoomChat } from "../App";
 
-const Room: FC = () => {
+interface RoomProps {
+  nickname: string;
+  roomChat: RoomChat[];
+  sendChatMessage: (text: string) => void;
+}
+
+const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
   const [fieldSize, setFieldSize] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +78,13 @@ const Room: FC = () => {
               {title()}
               <Field fieldSize={fieldSize} />
               <div className={`${style.chatBox} ${isChatOpened ? style.vertiCalchatBox : ""}`}>
-                <Chat fieldSize={fieldSize} isVertical={isVertical} />
+                <Chat
+                  nickname={nickname}
+                  roomChat={roomChat}
+                  fieldSize={fieldSize}
+                  isVertical={isVertical}
+                  sendChatMessage={sendChatMessage}
+                />
               </div>
               <button className={style.button} onClick={() => setIsChatOpened(!isChatOpened)}>
                 <img className={style.img} src={isChatOpened ? backImg : chatImg} alt="chat" />
@@ -80,8 +93,13 @@ const Room: FC = () => {
           ) : (
             <>
               <div>
-                {title()}
-                <Chat fieldSize={fieldSize} isVertical={isVertical} />
+                <Chat
+                  nickname={nickname}
+                  roomChat={roomChat}
+                  fieldSize={fieldSize}
+                  isVertical={isVertical}
+                  sendChatMessage={sendChatMessage}
+                />
               </div>
               <Field fieldSize={fieldSize} />
             </>

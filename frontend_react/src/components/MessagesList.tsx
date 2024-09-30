@@ -1,28 +1,28 @@
 import { FC } from "react";
 
 import style from "./MessagesList.module.scss";
-
-interface IMessage {
-  text: string;
-  date: string;
-  sender: string;
-}
+import { RoomChat } from "../App";
 
 interface MessagesListProps {
-  messageList: IMessage[];
+  nickname: string;
+  roomChat: RoomChat[];
 }
 
-const MessagesList: FC<MessagesListProps> = ({ messageList }) => {
+const MessagesList: FC<MessagesListProps> = ({ nickname, roomChat }) => {
   return (
     <>
-      {messageList.map((message, index) => {
+      {roomChat.map((message, index) => {
         return (
           <div
-            className={`${style.message} ${message.sender === "Me" ? style.endAlignMain : ""}`}
+            className={`${style.message} ${
+              message.nickname === nickname ? style.endAlignMain : ""
+            }`}
             key={message.text + index}
           >
             <div
-              className={`${style.colorMessegeBox} ${message.sender === "Me" ? style.color : ""}`}
+              className={`${style.colorMessegeBox} ${
+                message.nickname === nickname ? style.color : ""
+              }`}
             >
               <span className={style.text}>{message.text}</span>
               <span className={style.date}>{message.date}</span>

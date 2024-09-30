@@ -6,22 +6,22 @@ interface LowerButtonsProps {
   className?: string;
   isMobile: boolean;
   chosenRoom: number;
-  send: (inputNickname: string) => void;
-  join: (nickname: string, id: number) => void;
+  createRoom: (inputNickname: string) => void;
+  joinRoom: (nickname: string, id: number) => void;
 }
 
-const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, join, send }) => {
+const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, createRoom }) => {
   const [inputNickname, setInputNickname] = useState("");
 
   const createRoomHandler = () => {
     if (inputNickname) {
-      send(inputNickname);
+      createRoom(inputNickname);
     }
   };
 
   const joinRoomHandler = () => {
     if (inputNickname && chosenRoom) {
-      join(inputNickname, chosenRoom);
+      joinRoom(inputNickname, chosenRoom);
     }
   };
 

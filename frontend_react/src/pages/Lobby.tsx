@@ -7,12 +7,12 @@ import logo from "../assets/img/log.svg";
 import RoomsList, { IListItem } from "../components/RoomList.module";
 
 interface LobbyProps {
-  send: (nickname: string) => void;
-  join: (nickname: string, id: number) => void;
+  createRoom: (nickname: string) => void;
+  joinRoom: (nickname: string, id: number) => void;
   roomList: IListItem[];
 }
 
-const Lobby: FC<LobbyProps> = ({ roomList, join, send }) => {
+const Lobby: FC<LobbyProps> = ({ roomList, joinRoom, createRoom }) => {
   const [imgSize, setImgSize] = useState<number>(100);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -58,7 +58,12 @@ const Lobby: FC<LobbyProps> = ({ roomList, join, send }) => {
             </div>
           </div>
           <div className={style.roomListBox} style={{ width: isMobile ? "95%" : "600px" }}>
-            <RoomsList isMobile={isMobile} send={send} join={join} roomList={roomList} />
+            <RoomsList
+              isMobile={isMobile}
+              createRoom={createRoom}
+              joinRoom={joinRoom}
+              roomList={roomList}
+            />
           </div>
         </main>
       )}
