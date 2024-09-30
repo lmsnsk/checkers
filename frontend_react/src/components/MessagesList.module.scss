@@ -1,0 +1,37 @@
+.message {
+  font-size: 0.875rem;
+  margin-right: 8px;
+  display: flex;
+  justify-content: start;
+
+  .colorMessegeBox {
+    position: relative;
+    max-width: 95%;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    overflow-wrap: break-word;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    background-color: rgb(241, 241, 241);
+
+    .text {
+      padding-right: 28px;
+    }
+
+    .date {
+      position: absolute;
+      padding-left: 8px;
+      font-size: 70%;
+      bottom: 4px;
+      right: 4px;
+    }
+  }
+
+  .color {
+    background-color: rgb(216, 252, 216);
+  }
+}
+
+.endAlignMain {
+  justify-content: end;
+}

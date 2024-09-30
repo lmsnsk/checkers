@@ -1,0 +1,44 @@
+.main {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+
+  .input {
+    flex-grow: 1;
+    outline: none;
+    background-color: white;
+    padding: 8px;
+    border-radius: 8px;
+    border: none;
+
+    &:hover,
+    &:focus {
+      box-shadow: 0 0 10px 0 rgb(255, 255, 255);
+    }
+  }
+
+  .buttonBox {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+
+    & > button {
+      background-color: white;
+      padding: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 800;
+      border: none;
+      transition: 0.2s;
+
+      &:active {
+        scale: 0.95;
+      }
+
+      &:hover {
+        box-shadow: 0 0 10px 0 rgb(255, 255, 255);
+      }
+    }
+  }
+}

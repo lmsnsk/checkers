@@ -1,0 +1,59 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 100vw;
+  gap: 20px;
+  padding: 16px 0;
+
+  .head {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    // .titleImg {
+    // }
+
+    .title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+
+      .firstWord {
+        font-size: 3.75rem;
+      }
+      .secondWord {
+        font-size: 2.25rem;
+      }
+    }
+  }
+
+  .roomListBox {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) or (max-height: 768px) {
+  .main {
+    .head {
+      gap: 16px;
+      .title {
+        .firstWord {
+          font-size: 2.25rem;
+        }
+        .secondWord {
+          font-size: 1.5rem;
+        }
+      }
+    }
+    .roomListBox {
+      gap: 2rem;
+    }
+  }
+}

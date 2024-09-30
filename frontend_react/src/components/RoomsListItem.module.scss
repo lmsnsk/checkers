@@ -1,0 +1,23 @@
+.main {
+  width: 100%;
+  display: flex;
+  cursor: auto;
+  user-select: none;
+  border-bottom: 2px solid rgb(180, 180, 180);
+
+  .columnElement {
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+    flex-grow: 2;
+    flex-shrink: 1;
+    flex-basis: 0;
+  }
+
+  .title {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    padding-right: 8px;
+  }
+}
