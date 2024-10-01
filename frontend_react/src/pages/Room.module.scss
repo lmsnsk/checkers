@@ -19,6 +19,33 @@
     font-size: 2rem;
   }
 
+  .players {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+
+    .playerBox {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      max-width: min(95vw, 480px);
+      overflow: hidden;
+
+      .player {
+        margin-right: 20px;
+      }
+
+      .nickname {
+        color: rgb(165, 224, 165);
+      }
+
+      .waiting {
+        color: rgb(224, 165, 165);
+      }
+    }
+  }
+
   .chatBox {
     position: fixed;
     width: 100vw;
@@ -57,4 +84,13 @@
 
 .verticalMain {
   flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .main {
+    .players {
+      margin-bottom: 5px;
+      font-size: 1.25rem;
+    }
+  }
 }

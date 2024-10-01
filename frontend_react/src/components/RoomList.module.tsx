@@ -5,9 +5,9 @@ import LowerButtons from "./LowerButtons";
 import style from "./RoomList.module.scss";
 
 export interface IListItem {
-  id: number;
-  name: string;
-  players: number;
+  roomId: number;
+  roomName: string;
+  playersInRoom: number;
 }
 
 // const list: IListItem[] = [
@@ -63,14 +63,14 @@ const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, joinRoom, createRoo
         />
         <div className={style.itemList}>
           {roomList.map((room) => (
-            <Fragment key={room.id}>
+            <Fragment key={room.roomId}>
               <RoomsListItem
                 isTitle={false}
-                id={room.id}
+                id={room.roomId}
                 textSize={isMobile ? 1 : 1.25}
-                firstCol={room.name}
-                secondCol={`${room.players.toString()} / 2`}
-                isChosen={chosenRoom === room.id ? true : false}
+                firstCol={room.roomName}
+                secondCol={`${room.playersInRoom.toString()} / 2`}
+                isChosen={chosenRoom === room.roomId ? true : false}
                 setChosenRoom={setChosenRoom}
               />
             </Fragment>

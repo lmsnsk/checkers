@@ -1,11 +1,14 @@
 import { FC, useEffect, useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
-
-// import style from "./App.module.scss";
 
 import Lobby from "./pages/Lobby";
 import Room from "./pages/Room";
 import { useSocket } from "./lib/hooks";
+
+interface RoomListItem {
+  roomId: number;
+  roomName: string;
+  playersInRoom: number;
+}
 
 export interface RoomChat {
   text: string;
@@ -14,23 +17,25 @@ export interface RoomChat {
 }
 
 const App: FC = () => {
-  const [roomList, setRoomlist] = useState<any>([]);
+  const [roomList, setRoomlist] = useState<RoomListItem[]>([]);
   const [roomChat, setRoomChat] = useState<RoomChat[]>([]);
   const [nickname, setNickname] = useState("");
-
-  const navigate = useNavigate();
+  const [userId, setUserId] = useState<number | undefined>();
+  const [inGame, setInGame] = useState(false);
+  const [roomCreator, setRoomCreator] = useState("");
+  const [roomGuest, setRoomGuest] = useState("");
 
   const socket: WebSocket | null = useSocket();
 
   const createRoom = (nickname: string) => {
     if (socket) {
-      socket.send(JSON.stringify({ action: "create_room", nickname, piece_type: "white" }));
+      socket.send(JSON.stringify({ action: "create_room", nickname, userId, piece_type: "white" }));
     }
   };
 
-  const joinRoom = (nickname: string, id: number) => {
+  const joinRoom = (nickname: string, roomId: number) => {
     if (socket) {
-      socket.send(JSON.stringify({ action: "join_room", nickname, id }));
+      socket.send(JSON.stringify({ action: "join_room", nickname, userId, roomId: roomId }));
     }
   };
 
@@ -47,21 +52,34 @@ const App: FC = () => {
       console.log(data);
 
       switch (data.action) {
-        case "create_room":
+        case "room_list":
           setRoomlist(
             data.rooms.map((room: any) => ({
-              id: room.id,
-              name: room.name,
-              players: room.players.length,
+              roomId: room.roomId,
+              roomName: room.roomName,
+              playersInRoom: room.playersInRoom.length,
             }))
           );
           break;
+        case "create_user":
+          setUserId(data.userId);
+          break;
         case "to_room":
           setNickname(data.nickname);
-          navigate("/room");
+          setInGame(true);
+          break;
+        case "current_session":
+          setRoomCreator(data.session.players.creator.nickname);
+          setRoomGuest(data.session.players.guest?.nickname ?? "");
+
+          // console.log(data.currentSession.players.creator.nickname);
+
           break;
         case "chat_message":
           setRoomChat(data.chat);
+          break;
+        case "check_game": // reconnect
+          if (data.inGame) setInGame(true);
           break;
       }
     };
@@ -80,16 +98,19 @@ const App: FC = () => {
   }, [socket]);
 
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={<Lobby createRoom={createRoom} joinRoom={joinRoom} roomList={roomList} />}
-      />
-      <Route
-        path="/room"
-        element={<Room nickname={nickname} roomChat={roomChat} sendChatMessage={sendChatMessage} />}
-      />
-    </Routes>
+    <>
+      {inGame ? (
+        <Room
+          nickname={nickname}
+          roomChat={roomChat}
+          sendChatMessage={sendChatMessage}
+          roomCreator={roomCreator}
+          roomGuest={roomGuest}
+        />
+      ) : (
+        <Lobby createRoom={createRoom} joinRoom={joinRoom} roomList={roomList} />
+      )}
+    </>
   );
 };
 

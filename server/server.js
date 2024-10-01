@@ -8,8 +8,11 @@ var connection = new ws_1.WebSocketServer({ port: 8080, path: "/ws/checkers" });
 var PORT = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 3001;
 var rooms = [];
 var sessions = [];
-var users = [];
-// const users = new Map<number, WebSocket>();
+var users = new Map();
+var userCounter = 0;
+var userIdGenerator = function () {
+    return userCounter++;
+};
 var dateToString = function () {
     return new Date().toLocaleTimeString("ru", {
         hour: "2-digit",
@@ -18,30 +21,41 @@ var dateToString = function () {
 };
 var sendAllUsersRoomList = function () {
     users.forEach(function (user) {
-        user.send(JSON.stringify({ action: "create_room", rooms: rooms }));
+        user.ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
     });
 };
-var createRoom = function (nickname, ws) {
+var createRoom = function (nickname, ws, userId) {
+    users.set(userId, { ws: ws, inGame: true, nickname: nickname });
+    var roomId = rooms.length + 1;
     var room = {
-        id: rooms.length + 1,
-        name: nickname,
+        roomId: roomId,
+        roomName: nickname,
         created: dateToString(),
-        players: [{ name: nickname, pieceType: "white" }],
+        playersInRoom: [{ nickname: nickname, userId: userId, pieceType: "white" }],
     };
     rooms.push(room);
-    sessions.push({
-        id: sessions.length + 1,
+    var currentSession = {
+        roomId: roomId,
         created: dateToString(),
-        players: { creator: { connect: ws, nickname: nickname } },
+        players: { creator: { ws: ws, userId: userId, nickname: nickname } },
         chat: [],
-    });
+    };
+    sessions.push(currentSession);
+    ws.send(JSON.stringify({ action: "current_session", session: currentSession }));
 };
-var joinRoom = function (nickname, id, ws) {
-    if (rooms[id - 1].players.length === 1) {
-        rooms[id - 1].players.push({ name: nickname, pieceType: "black" });
+var joinRoom = function (nickname, roomId, ws, userId) {
+    users.set(userId, { ws: ws, inGame: true, nickname: nickname });
+    if (rooms[roomId - 1].playersInRoom.length === 1) {
+        rooms[roomId - 1].playersInRoom.push({
+            nickname: nickname,
+            userId: userId,
+            pieceType: "black",
+        });
         sessions.forEach(function (session) {
-            if (session.id === id) {
-                session.players.guest = { connect: ws, nickname: nickname };
+            if (session.roomId === roomId) {
+                session.players.guest = { ws: ws, userId: userId, nickname: nickname };
+                ws.send(JSON.stringify({ action: "current_session", session: session }));
+                session.players.creator.ws.send(JSON.stringify({ action: "current_session", session: session }));
             }
         });
         return true;
@@ -49,28 +63,30 @@ var joinRoom = function (nickname, id, ws) {
     return false;
 };
 connection.on("connection", function (ws) {
-    console.log("Client connected");
-    users.push(ws);
-    ws.send(JSON.stringify({ action: "create_room", rooms: rooms }));
+    // console.log("Client connected");
+    var currentUserId = userIdGenerator();
+    users.set(currentUserId, { ws: ws, inGame: false });
+    ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+    ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
     ws.on("message", function (message) {
         var data = JSON.parse(message.toString());
         switch (data.action) {
             case "create_room":
-                createRoom(data.nickname, ws);
+                createRoom(data.nickname, ws, data.userId);
                 sendAllUsersRoomList();
                 ws.send(JSON.stringify({
                     action: "to_room",
                     nickname: data.nickname,
-                    id: data.id,
+                    roomId: data.roomId,
                 }));
                 break;
             case "join_room":
-                if (joinRoom(data.nickname, data.id, ws)) {
+                if (joinRoom(data.nickname, data.roomId, ws, data.userId)) {
                     sendAllUsersRoomList();
                     ws.send(JSON.stringify({
                         action: "to_room",
                         nickname: data.nickname,
-                        id: data.id,
+                        roomId: data.roomId,
                     }));
                 }
                 break;
@@ -81,8 +97,8 @@ connection.on("connection", function (ws) {
                     var guest = session.players.guest;
                     if (data.nickname === creator.nickname || data.nickname === (guest === null || guest === void 0 ? void 0 : guest.nickname)) {
                         session.chat.push({ nickname: data.nickname, date: dateToString(), text: data.text });
-                        creator.connect.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
-                        (_a = guest === null || guest === void 0 ? void 0 : guest.connect) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
+                        creator.ws.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
+                        (_a = guest === null || guest === void 0 ? void 0 : guest.ws) === null || _a === void 0 ? void 0 : _a.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
                     }
                 });
                 break;
@@ -90,7 +106,12 @@ connection.on("connection", function (ws) {
     });
     ws.on("close", function () {
         sendAllUsersRoomList();
-        console.log("Client disconnected");
+        users.forEach(function (user, key) {
+            if (user.ws === ws) {
+                users.delete(key);
+            }
+        });
+        // console.log("Client disconnected");
     });
 });
 app.listen(PORT, function () {

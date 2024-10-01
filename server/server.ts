@@ -9,25 +9,37 @@ const connection = new WebSocketServer({ port: 8080, path: "/ws/checkers" });
 const PORT = process.env.PORT ?? 3001;
 
 interface Room {
-  id: number;
-  name: string;
+  roomId: number;
+  roomName: string;
   created: string;
-  players: { name: string; pieceType: string }[];
+  playersInRoom: { nickname: string; userId: number; pieceType: string }[];
+}
+
+interface User {
+  ws: WebSocket;
+  inGame: boolean;
+  nickname?: string;
 }
 
 interface Session {
-  id: number;
+  roomId: number;
   created: string;
   players: {
-    creator: { connect: WebSocket; nickname: string };
-    guest?: { connect: WebSocket; nickname: string };
+    creator: { ws: WebSocket; userId: number; nickname: string };
+    guest?: { ws: WebSocket; userId: number; nickname: string };
   };
   chat: { nickname: string; date: string; text: string }[];
 }
 
 const rooms: Room[] = [];
 const sessions: Session[] = [];
-const users: WebSocket[] = [];
+const users = new Map<number, User>();
+
+let userCounter = 0;
+
+const userIdGenerator = () => {
+  return userCounter++;
+};
 
 const dateToString = () => {
   return new Date().toLocaleTimeString("ru", {
@@ -38,34 +50,47 @@ const dateToString = () => {
 
 const sendAllUsersRoomList = () => {
   users.forEach((user) => {
-    user.send(JSON.stringify({ action: "create_room", rooms: rooms }));
+    user.ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
   });
 };
 
-const createRoom = (nickname: string, ws: WebSocket) => {
+const createRoom = (nickname: string, ws: WebSocket, userId: number) => {
+  users.set(userId, { ws, inGame: true, nickname });
+
+  const roomId = rooms.length + 1;
   const room = {
-    id: rooms.length + 1,
-    name: nickname,
+    roomId: roomId,
+    roomName: nickname,
     created: dateToString(),
-    players: [{ name: nickname, pieceType: "white" }],
+    playersInRoom: [{ nickname: nickname, userId: userId, pieceType: "white" }],
   };
   rooms.push(room);
 
-  sessions.push({
-    id: sessions.length + 1,
+  const currentSession: Session = {
+    roomId: roomId,
     created: dateToString(),
-    players: { creator: { connect: ws, nickname } },
+    players: { creator: { ws: ws, userId: userId, nickname } },
     chat: [],
-  });
+  };
+  sessions.push(currentSession);
+  ws.send(JSON.stringify({ action: "current_session", session: currentSession }));
 };
 
-const joinRoom = (nickname: string, id: number, ws: WebSocket) => {
-  if (rooms[id - 1].players.length === 1) {
-    rooms[id - 1].players.push({ name: nickname, pieceType: "black" });
+const joinRoom = (nickname: string, roomId: number, ws: WebSocket, userId: number) => {
+  users.set(userId, { ws, inGame: true, nickname });
+
+  if (rooms[roomId - 1].playersInRoom.length === 1) {
+    rooms[roomId - 1].playersInRoom.push({
+      nickname: nickname,
+      userId: userId,
+      pieceType: "black",
+    });
 
     sessions.forEach((session) => {
-      if (session.id === id) {
-        session.players.guest = { connect: ws, nickname };
+      if (session.roomId === roomId) {
+        session.players.guest = { ws: ws, userId: userId, nickname };
+        ws.send(JSON.stringify({ action: "current_session", session }));
+        session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
       }
     });
     return true;
@@ -74,32 +99,38 @@ const joinRoom = (nickname: string, id: number, ws: WebSocket) => {
 };
 
 connection.on("connection", (ws: WebSocket) => {
-  console.log("Client connected");
-  users.push(ws);
-  ws.send(JSON.stringify({ action: "create_room", rooms: rooms }));
+  // console.log("Client connected");
+
+  let currentUserId = userIdGenerator();
+
+  users.set(currentUserId, { ws, inGame: false });
+
+  ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+  ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
 
   ws.on("message", (message) => {
     const data = JSON.parse(message.toString());
+
     switch (data.action) {
       case "create_room":
-        createRoom(data.nickname, ws);
+        createRoom(data.nickname, ws, data.userId);
         sendAllUsersRoomList();
         ws.send(
           JSON.stringify({
             action: "to_room",
             nickname: data.nickname,
-            id: data.id,
+            roomId: data.roomId,
           })
         );
         break;
       case "join_room":
-        if (joinRoom(data.nickname, data.id, ws)) {
+        if (joinRoom(data.nickname, data.roomId, ws, data.userId)) {
           sendAllUsersRoomList();
           ws.send(
             JSON.stringify({
               action: "to_room",
               nickname: data.nickname,
-              id: data.id,
+              roomId: data.roomId,
             })
           );
         }
@@ -111,8 +142,8 @@ connection.on("connection", (ws: WebSocket) => {
 
           if (data.nickname === creator.nickname || data.nickname === guest?.nickname) {
             session.chat.push({ nickname: data.nickname, date: dateToString(), text: data.text });
-            creator.connect.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
-            guest?.connect?.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
+            creator.ws.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
+            guest?.ws?.send(JSON.stringify({ action: "chat_message", chat: session.chat }));
           }
         });
         break;
@@ -121,7 +152,12 @@ connection.on("connection", (ws: WebSocket) => {
 
   ws.on("close", () => {
     sendAllUsersRoomList();
-    console.log("Client disconnected");
+    users.forEach((user, key) => {
+      if (user.ws === ws) {
+        users.delete(key);
+      }
+    });
+    // console.log("Client disconnected");
   });
 });
 

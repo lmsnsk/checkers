@@ -14,6 +14,18 @@
     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
     background-color: rgb(241, 241, 241);
 
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -12px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-right: 10px solid rgb(241, 241, 241);
+    }
+
     .text {
       padding-right: 28px;
     }
@@ -29,6 +41,22 @@
 
   .color {
     background-color: rgb(216, 252, 216);
+
+    &::after {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -12px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid rgb(216, 252, 216);
+      border-bottom: 10px solid transparent;
+      border-right: 10px solid transparent;
+    }
   }
 }
 

@@ -11,10 +11,12 @@ import { RoomChat } from "../App";
 interface RoomProps {
   nickname: string;
   roomChat: RoomChat[];
+  roomCreator: string;
+  roomGuest: string;
   sendChatMessage: (text: string) => void;
 }
 
-const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
+const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendChatMessage }) => {
   const [fieldSize, setFieldSize] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +71,25 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
     );
   };
 
+  const showPlayers = () => {
+    return (
+      <div className={style.players}>
+        <div className={style.playerBox}>
+          <span className={style.player}>Хозян комнаты:</span>
+          <span className={style.nickname}>
+            <strong>{roomCreator}</strong>
+          </span>
+        </div>
+        <div className={style.playerBox}>
+          <span className={style.player}>Гость:</span>
+          <span className={style.nickname + " " + (roomGuest ? "" : style.waiting)}>
+            {roomGuest ? <strong>{roomGuest}</strong> : "Ожидание..."}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {isLoading && (
@@ -76,6 +97,7 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
           {isVertical ? (
             <>
               {title()}
+              {showPlayers()}
               <Field fieldSize={fieldSize} />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
@@ -86,7 +108,11 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
                   sendChatMessage={sendChatMessage}
                 />
               </div>
-              <button className={style.button} onClick={() => setIsChatOpened(!isChatOpened)}>
+              <button
+                disabled={roomGuest ? false : true}
+                className={style.button}
+                onClick={() => setIsChatOpened(!isChatOpened)}
+              >
                 <img className={style.img} src={isChatOpened ? backImg : chatImg} alt="chat" />
               </button>
             </>
@@ -94,6 +120,7 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, sendChatMessage }) => {
             <>
               <div>
                 {title()}
+                {showPlayers()}
                 <Chat
                   nickname={nickname}
                   roomChat={roomChat}
