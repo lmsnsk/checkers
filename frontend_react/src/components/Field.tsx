@@ -1,9 +1,10 @@
 import { useSound } from "../lib/hooks";
 import { clearTempCheckers } from "../lib/utils";
-import { FC, MouseEvent, useState } from "react";
+import { FC, Fragment, MouseEvent, useState } from "react";
 import Figures from "./Figures";
 
 import style from "./Field.module.scss";
+import Preloader from "./Preloader";
 
 const initialField = [
   [1, 0, 0, 1, 0, 1, 0, 1],
@@ -36,7 +37,13 @@ interface CheckerType {
   isQueen: boolean;
 }
 
-const Field: FC<{ fieldSize: number }> = ({ fieldSize }) => {
+interface FieldProps {
+  fieldSize: number;
+  roomCreator: string;
+  roomGuest: string;
+}
+
+const Field: FC<FieldProps> = ({ fieldSize, roomCreator, roomGuest }) => {
   const [field, setField] = useState(initialField);
   const [repeatMove, setRepeatMove] = useState(false);
   const [playerColor, setPlayerColor] = useState<1 | 2>(2);
@@ -193,22 +200,25 @@ const Field: FC<{ fieldSize: number }> = ({ fieldSize }) => {
   };
 
   return (
-    <div className={style.main}>
-      {drawMarginRow("top")}
-      <div className={style.wrapper}>
-        {drawMarginColumn("left")}
-        <div
-          className={style.field}
-          style={{ height: fieldSize, width: fieldSize }}
-          onClick={onClickHandler}
-        >
-          {drawField()}
-          <Figures field={field} fieldSize={fieldSize} />
+    <>
+      <div className={style.main}>
+        {drawMarginRow("top")}
+        <div className={style.wrapper}>
+          {drawMarginColumn("left")}
+          <div
+            className={style.field}
+            style={{ height: fieldSize, width: fieldSize }}
+            onClick={onClickHandler}
+          >
+            {drawField()}
+            <Figures field={field} fieldSize={fieldSize} />
+          </div>
+          {drawMarginColumn("right")}
         </div>
-        {drawMarginColumn("right")}
+        {drawMarginRow("bottom")}
+        {(!roomCreator || !roomGuest) && <Preloader />}
       </div>
-      {drawMarginRow("bottom")}
-    </div>
+    </>
   );
 };
 

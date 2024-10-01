@@ -53,8 +53,8 @@ const Lobby: FC<LobbyProps> = ({ roomList, joinRoom, createRoom }) => {
           <div className={style.head}>
             <img src={logo} alt="logo" style={{ width: imgSize, height: imgSize }} />
             <div className={style.title}>
-              <span className={style.firstWord}>CHECKERS</span>
-              <span className={style.secondWord}>ONLINE</span>
+              <span className={style.firstWord}>ШАШКИ</span>
+              <span className={style.secondWord}>ОНЛАЙН</span>
             </div>
           </div>
           <div className={style.roomListBox} style={{ width: isMobile ? "95%" : "600px" }}>

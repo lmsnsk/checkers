@@ -7,8 +7,11 @@ import MessagesList from "./MessagesList";
 import emojiImg from "../assets/img/emoji.png";
 import sendImg from "../assets/img/send.png";
 import { RoomChat } from "../App";
+import Preloader from "./Preloader";
 
 interface ChatProps {
+  roomCreator: string;
+  roomGuest: string;
   nickname: string;
   roomChat: RoomChat[];
   fieldSize: number;
@@ -16,7 +19,15 @@ interface ChatProps {
   sendChatMessage: (text: string) => void;
 }
 
-const Chat: FC<ChatProps> = ({ nickname, roomChat, fieldSize, isVertical, sendChatMessage }) => {
+const Chat: FC<ChatProps> = ({
+  nickname,
+  roomChat,
+  fieldSize,
+  isVertical,
+  sendChatMessage,
+  roomCreator,
+  roomGuest,
+}) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
 
@@ -74,7 +85,7 @@ const Chat: FC<ChatProps> = ({ nickname, roomChat, fieldSize, isVertical, sendCh
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyDown={keyDownHandler}
-            placeholder="Enter your message..."
+            placeholder="Введите ваше сообщение..."
           />
           <div className={style.emoji} onClick={() => setIsEmojiOpen(!isEmojiOpen)}>
             <img src={emojiImg} alt="emoji" />
@@ -89,6 +100,7 @@ const Chat: FC<ChatProps> = ({ nickname, roomChat, fieldSize, isVertical, sendCh
             <img src={sendImg} alt="send" />
           </button>
         </div>
+        {(!roomCreator || !roomGuest) && <Preloader />}
       </div>
     </div>
   );

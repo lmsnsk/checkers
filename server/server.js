@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var express = require("express");
 var ws_1 = require("ws");
 var app = express();
-var connection = new ws_1.WebSocketServer({ port: 8080, path: "/ws/checkers" });
+var wss = new ws_1.WebSocketServer({ port: 8080, path: "/ws/checkers" });
 var PORT = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 3001;
 var rooms = [];
 var sessions = [];
@@ -62,12 +62,12 @@ var joinRoom = function (nickname, roomId, ws, userId) {
     }
     return false;
 };
-connection.on("connection", function (ws) {
+wss.on("connection", function (ws) {
     // console.log("Client connected");
     var currentUserId = userIdGenerator();
     users.set(currentUserId, { ws: ws, inGame: false });
-    ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
     ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
+    ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
     ws.on("message", function (message) {
         var data = JSON.parse(message.toString());
         switch (data.action) {

@@ -31,9 +31,10 @@
       flex-wrap: wrap;
       max-width: min(95vw, 480px);
       overflow: hidden;
+      gap: 10px;
 
-      .player {
-        margin-right: 20px;
+      img {
+        width: 28px;
       }
 
       .nickname {

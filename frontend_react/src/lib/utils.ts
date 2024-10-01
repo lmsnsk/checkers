@@ -5,3 +5,21 @@ export const clearTempCheckers = (field: number[][]) => {
     }
   }
 };
+
+// export const getFromLocalStorage = (key: string) => {
+//   if (typeof localStorage !== "undefined") {
+//     return localStorage.getItem(key);
+//   }
+// };
+
+// export const setToLocalStorage = (key: string, value: string) => {
+//   if (typeof localStorage !== "undefined") {
+//     localStorage.setItem(key, value);
+//   }
+// };
+
+// export const removeFromLocalStorage = (key: string) => {
+//   if (typeof localStorage !== "undefined") {
+//     localStorage.removeItem(key);
+//   }
+// };

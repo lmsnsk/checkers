@@ -1,12 +1,14 @@
 import { FC, useEffect, useState } from "react";
 
-import style from "./Room.module.scss";
-
 import Chat from "../components/Chat";
 import Field from "../components/Field";
 import chatImg from "../assets/img/chat.png";
 import backImg from "../assets/img/back.png";
 import { RoomChat } from "../App";
+
+import preloader from "../assets/img/ghost.gif";
+
+import style from "./Room.module.scss";
 
 interface RoomProps {
   nickname: string;
@@ -75,13 +77,15 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
     return (
       <div className={style.players}>
         <div className={style.playerBox}>
-          <span className={style.player}>Хозян комнаты:</span>
-          <span className={style.nickname}>
-            <strong>{roomCreator}</strong>
+          <span>Игрок 1:</span>
+          {!roomCreator && <img src={preloader} alt="preloader" />}
+          <span className={style.nickname + " " + (roomCreator ? "" : style.waiting)}>
+            {roomCreator ? <strong>{roomCreator}</strong> : "Ожидание..."}
           </span>
         </div>
         <div className={style.playerBox}>
-          <span className={style.player}>Гость:</span>
+          <span>Игрок 2:</span>
+          {!roomGuest && <img src={preloader} alt="preloader" />}
           <span className={style.nickname + " " + (roomGuest ? "" : style.waiting)}>
             {roomGuest ? <strong>{roomGuest}</strong> : "Ожидание..."}
           </span>
@@ -98,9 +102,11 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
             <>
               {title()}
               {showPlayers()}
-              <Field fieldSize={fieldSize} />
+              <Field fieldSize={fieldSize} roomCreator={roomCreator} roomGuest={roomGuest} />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
+                  roomCreator={roomCreator}
+                  roomGuest={roomGuest}
                   nickname={nickname}
                   roomChat={roomChat}
                   fieldSize={fieldSize}
@@ -122,6 +128,8 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
                 {title()}
                 {showPlayers()}
                 <Chat
+                  roomCreator={roomCreator}
+                  roomGuest={roomGuest}
                   nickname={nickname}
                   roomChat={roomChat}
                   fieldSize={fieldSize}
@@ -129,7 +137,7 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
                   sendChatMessage={sendChatMessage}
                 />
               </div>
-              <Field fieldSize={fieldSize} />
+              <Field fieldSize={fieldSize} roomCreator={roomCreator} roomGuest={roomGuest} />
             </>
           )}
         </div>

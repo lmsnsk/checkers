@@ -13,6 +13,10 @@ interface LowerButtonsProps {
 const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, createRoom }) => {
   const [inputNickname, setInputNickname] = useState("");
 
+  const inputNicknameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (inputNickname.length < 20) setInputNickname(e.target.value);
+  };
+
   const createRoomHandler = () => {
     if (inputNickname) {
       createRoom(inputNickname);
@@ -30,12 +34,13 @@ const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, c
       <input
         className={style.input}
         type="text"
-        placeholder="Enter your nickname..."
-        onChange={(e) => setInputNickname(e.target.value)}
+        placeholder="Введите ваш ник..."
+        value={inputNickname}
+        onChange={inputNicknameHandler}
       />
       <div className={style.buttonBox}>
-        <button onClick={createRoomHandler}>CREATE ROOM</button>
-        <button onClick={joinRoomHandler}>JOIN</button>
+        <button onClick={createRoomHandler}>СОЗДАТЬ КОМНАТУ</button>
+        <button onClick={joinRoomHandler}>ПРИСОЕДИНИТЬСЯ</button>
       </div>
     </div>
   );

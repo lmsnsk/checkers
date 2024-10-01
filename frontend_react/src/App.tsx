@@ -71,9 +71,6 @@ const App: FC = () => {
         case "current_session":
           setRoomCreator(data.session.players.creator.nickname);
           setRoomGuest(data.session.players.guest?.nickname ?? "");
-
-          // console.log(data.currentSession.players.creator.nickname);
-
           break;
         case "chat_message":
           setRoomChat(data.chat);
@@ -115,4 +112,3 @@ const App: FC = () => {
 };
 
 export default App;
-

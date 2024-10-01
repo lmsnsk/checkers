@@ -4,7 +4,7 @@ import { WebSocket, WebSocketServer } from "ws";
 
 const app = express();
 
-const connection = new WebSocketServer({ port: 8080, path: "/ws/checkers" });
+const wss = new WebSocketServer({ port: 8080, path: "/ws/checkers" });
 
 const PORT = process.env.PORT ?? 3001;
 
@@ -98,15 +98,13 @@ const joinRoom = (nickname: string, roomId: number, ws: WebSocket, userId: numbe
   return false;
 };
 
-connection.on("connection", (ws: WebSocket) => {
+wss.on("connection", (ws: WebSocket) => {
   // console.log("Client connected");
-
-  let currentUserId = userIdGenerator();
-
+  const currentUserId = userIdGenerator();
   users.set(currentUserId, { ws, inGame: false });
+  ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
 
   ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
-  ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
 
   ws.on("message", (message) => {
     const data = JSON.parse(message.toString());
