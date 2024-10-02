@@ -4,6 +4,7 @@ import { messages } from "./chat";
 import { userIdGenerator } from "../lib/helpers";
 import { Room, Session, User } from "../lib/types";
 import { createRoom, joinRoom, sendAllUsersRoomList } from "./rooms";
+import { coordinates, sendGameState } from "./game";
 
 const rooms: Room[] = [];
 const sessions: Session[] = [];
@@ -43,9 +44,14 @@ export const wssConnection = () => {
           break;
         case "join_room":
           joinRoom(ws, data, users, rooms, sessions);
+          sendGameState(ws, sessions, data);
           break;
         case "chat_message":
           messages(data, sessions);
+          break;
+        case "coordinates":
+          // console.log(data.coordinates);
+          coordinates(ws, users, data);
           break;
       }
     });

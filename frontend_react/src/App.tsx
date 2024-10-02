@@ -21,9 +21,11 @@ const App: FC = () => {
   const [roomChat, setRoomChat] = useState<RoomChat[]>([]);
   const [nickname, setNickname] = useState("");
   const [userId, setUserId] = useState<number | undefined>();
+  const [creator, setCreator] = useState(false);
   const [inGame, setInGame] = useState(false);
   const [roomCreator, setRoomCreator] = useState("");
   const [roomGuest, setRoomGuest] = useState("");
+  const [field, setField] = useState<number[][]>(Array(8).fill(Array(8).fill(0)));
 
   const socket: WebSocket | null = useSocket();
 
@@ -35,13 +37,25 @@ const App: FC = () => {
 
   const joinRoom = (nickname: string, roomId: number) => {
     if (socket) {
-      socket.send(JSON.stringify({ action: "join_room", nickname, userId, roomId: roomId }));
+      socket.send(JSON.stringify({ action: "join_room", nickname, userId, roomId }));
     }
   };
 
   const sendChatMessage = (text: string) => {
     if (socket) {
       socket.send(JSON.stringify({ action: "chat_message", text, nickname }));
+    }
+  };
+
+  const updateField = (field: number[][]) => {
+    setField(field);
+  };
+
+  const sendCoordinates = (x: number, y: number, userId: number | undefined) => {
+    if (socket) {
+      socket.send(
+        JSON.stringify({ action: "coordinates", coordinates: { x, y }, userId, creator })
+      );
     }
   };
 
@@ -75,6 +89,9 @@ const App: FC = () => {
         case "chat_message":
           setRoomChat(data.chat);
           break;
+        case "game_state":
+          updateField(data.gameState);
+          break;
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);
           break;
@@ -88,10 +105,8 @@ const App: FC = () => {
         console.log("Подключение прервано");
       };
     }
-    return () => {
-      socket?.close();
-      console.log("Подключение окончено");
-    };
+
+    return () => socket?.close();
   }, [socket]);
 
   return (
@@ -103,9 +118,17 @@ const App: FC = () => {
           sendChatMessage={sendChatMessage}
           roomCreator={roomCreator}
           roomGuest={roomGuest}
+          field={field}
+          sendCoordinates={sendCoordinates}
+          userId={userId}
         />
       ) : (
-        <Lobby createRoom={createRoom} joinRoom={joinRoom} roomList={roomList} />
+        <Lobby
+          createRoom={createRoom}
+          joinRoom={joinRoom}
+          roomList={roomList}
+          setCreator={setCreator}
+        />
       )}
     </>
   );

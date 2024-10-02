@@ -4,15 +4,16 @@ import style from "./Lobby.module.scss";
 
 import logo from "../assets/img/log.svg";
 
-import RoomsList, { IListItem } from "../components/RoomList.module";
+import RoomsList, { IListItem } from "../components/RoomList";
 
 interface LobbyProps {
   createRoom: (nickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
   roomList: IListItem[];
+  setCreator: (creator: boolean) => void;
 }
 
-const Lobby: FC<LobbyProps> = ({ roomList, joinRoom, createRoom }) => {
+const Lobby: FC<LobbyProps> = ({ roomList, setCreator, joinRoom, createRoom }) => {
   const [imgSize, setImgSize] = useState<number>(100);
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,6 +60,7 @@ const Lobby: FC<LobbyProps> = ({ roomList, joinRoom, createRoom }) => {
           </div>
           <div className={style.roomListBox} style={{ width: isMobile ? "95%" : "600px" }}>
             <RoomsList
+              setCreator={setCreator}
               isMobile={isMobile}
               createRoom={createRoom}
               joinRoom={joinRoom}

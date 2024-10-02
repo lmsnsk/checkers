@@ -29,7 +29,9 @@ export const createRoom = (
   const currentSession: Session = {
     roomId: roomId,
     created: dateToString(),
-    players: { creator: { ws: ws, userId: data.userId, nickname: data.nickname } },
+    players: {
+      creator: { ws: ws, userId: data.userId, nickname: data.nickname, pieceType: "white" },
+    },
     chat: [],
   };
   sessions.push(currentSession);
@@ -65,7 +67,12 @@ export const joinRoom = (
 
   sessions.forEach((session) => {
     if (session.roomId === data.roomId) {
-      session.players.guest = { ws: ws, userId: data.userId, nickname: data.nickname };
+      session.players.guest = {
+        ws: ws,
+        userId: data.userId,
+        nickname: data.nickname,
+        pieceType: "black",
+      };
       ws.send(JSON.stringify({ action: "current_session", session }));
       session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
     }

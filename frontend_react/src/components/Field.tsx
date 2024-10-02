@@ -6,16 +6,6 @@ import Figures from "./Figures";
 import style from "./Field.module.scss";
 import Preloader from "./Preloader";
 
-const initialField = [
-  [1, 0, 0, 1, 0, 1, 0, 1],
-  [1, 0, 0, 0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 0, 0, 0, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-  [0, 2, 0, 2, 0, 2, 0, 2],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-];
 /*
 0 - пустая
 1 - белая
@@ -41,10 +31,19 @@ interface FieldProps {
   fieldSize: number;
   roomCreator: string;
   roomGuest: string;
+  field: number[][];
+  userId: number | undefined;
+  sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
-const Field: FC<FieldProps> = ({ fieldSize, roomCreator, roomGuest }) => {
-  const [field, setField] = useState(initialField);
+const Field: FC<FieldProps> = ({
+  fieldSize,
+  roomCreator,
+  roomGuest,
+  field,
+  userId,
+  sendCoordinates,
+}) => {
   const [repeatMove, setRepeatMove] = useState(false);
   const [playerColor, setPlayerColor] = useState<1 | 2>(2);
   const [currentChecker, setCurrentChecker] = useState<CheckerType | null>(null);
@@ -136,24 +135,25 @@ const Field: FC<FieldProps> = ({ fieldSize, roomCreator, roomGuest }) => {
     const x = Math.floor((e.clientX - rect.left) / (rect.width / 8));
     const y = Math.floor((e.clientY - rect.top) / (rect.height / 8));
 
-    if (!currentChecker && field[y][x] === 0) {
-      return;
-    }
-    if (field[y][x] === playerColor) {
-      clearTempCheckers(field);
-      setCurrentChecker({ x, y, color: field[y][x] as CheckerType["color"], isQueen: true });
-      checkNextMove(x, y, true); // проверка дамки
-      setField([...field]);
-      return;
-    }
-    if (currentChecker && field[y][x] === 9) {
-      clearTempCheckers(field); // придет с сервера, не нужно очищать
-      field[currentChecker.y][currentChecker.x] = 0;
-      field[y][x] = currentChecker.color;
-      setField([...field]);
-      setCurrentChecker(null);
-      // playSound();
-    }
+    sendCoordinates(x, y, userId);
+    // if (!currentChecker && field[y][x] === 0) {
+    //   return;
+    // }
+    // if (field[y][x] === playerColor) {
+    //   clearTempCheckers(field);
+    //   setCurrentChecker({ x, y, color: field[y][x] as CheckerType["color"], isQueen: true });
+    //   checkNextMove(x, y, true); // проверка дамки
+    //   // setField([...field]);
+    //   return;
+    // }
+    // if (currentChecker && field[y][x] === 9) {
+    //   clearTempCheckers(field); // придет с сервера, не нужно очищать
+    //   field[currentChecker.y][currentChecker.x] = 0;
+    //   field[y][x] = currentChecker.color;
+    //   // setField([...field]);
+    //   setCurrentChecker(null);
+    //   // playSound();
+    // }
   };
 
   const drawField = () => {

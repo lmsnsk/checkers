@@ -17,8 +17,8 @@ export interface Session {
   roomId: number;
   created: string;
   players: {
-    creator: { ws: WebSocket; userId: number; nickname: string };
-    guest?: { ws: WebSocket; userId: number; nickname: string };
+    creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
+    guest?: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
   };
   chat: { nickname: string; date: string; text: string }[];
 }

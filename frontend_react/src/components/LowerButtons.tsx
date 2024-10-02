@@ -3,14 +3,20 @@ import { FC, useState } from "react";
 import style from "./LowerButtons.module.scss";
 
 interface LowerButtonsProps {
-  className?: string;
   isMobile: boolean;
   chosenRoom: number;
   createRoom: (inputNickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
+  setCreator: (creator: boolean) => void;
 }
 
-const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, createRoom }) => {
+const LowerButtons: FC<LowerButtonsProps> = ({
+  chosenRoom,
+  isMobile,
+  joinRoom,
+  createRoom,
+  setCreator,
+}) => {
   const [inputNickname, setInputNickname] = useState("");
 
   const inputNicknameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,6 +26,7 @@ const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, c
   const createRoomHandler = () => {
     if (inputNickname) {
       createRoom(inputNickname);
+      setCreator(true);
     }
   };
 
@@ -30,7 +37,7 @@ const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, c
   };
 
   return (
-    <div className={style.main} style={{ flexDirection: isMobile ? "column" : "row" }}>
+    <div className={`${style.main} ${isMobile && style.mobileMain}`}>
       <input
         className={style.input}
         type="text"

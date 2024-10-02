@@ -15,9 +15,16 @@ interface RoomsListProps {
   createRoom: (nickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
   roomList: IListItem[];
+  setCreator: (creator: boolean) => void;
 }
 
-const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, joinRoom, createRoom }) => {
+const RoomsList: FC<RoomsListProps> = ({
+  isMobile,
+  roomList,
+  joinRoom,
+  createRoom,
+  setCreator,
+}) => {
   const [chosenRoom, setChosenRoom] = useState(0);
 
   return (
@@ -46,6 +53,7 @@ const RoomsList: FC<RoomsListProps> = ({ isMobile, roomList, joinRoom, createRoo
         </div>
       </div>
       <LowerButtons
+        setCreator={setCreator}
         chosenRoom={chosenRoom}
         isMobile={isMobile}
         createRoom={createRoom}

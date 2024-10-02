@@ -15,10 +15,22 @@ interface RoomProps {
   roomChat: RoomChat[];
   roomCreator: string;
   roomGuest: string;
+  field: number[][];
+  userId: number | undefined;
   sendChatMessage: (text: string) => void;
+  sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
-const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendChatMessage }) => {
+const Room: FC<RoomProps> = ({
+  nickname,
+  roomChat,
+  roomCreator,
+  roomGuest,
+  field,
+  userId,
+  sendChatMessage,
+  sendCoordinates,
+}) => {
   const [fieldSize, setFieldSize] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,23 +85,14 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
     );
   };
 
-  const showPlayers = () => {
+  const showPlayer = (player: string, number: number) => {
     return (
-      <div className={style.players}>
-        <div className={style.playerBox}>
-          <span>Игрок 1:</span>
-          {!roomCreator && <img src={preloader} alt="preloader" />}
-          <span className={style.nickname + " " + (roomCreator ? "" : style.waiting)}>
-            {roomCreator ? <strong>{roomCreator}</strong> : "Ожидание..."}
-          </span>
-        </div>
-        <div className={style.playerBox}>
-          <span>Игрок 2:</span>
-          {!roomGuest && <img src={preloader} alt="preloader" />}
-          <span className={style.nickname + " " + (roomGuest ? "" : style.waiting)}>
-            {roomGuest ? <strong>{roomGuest}</strong> : "Ожидание..."}
-          </span>
-        </div>
+      <div className={style.playerBox}>
+        <span>Игрок {number}:</span>
+        {!player && <img src={preloader} alt="preloader" />}
+        <span className={style.nickname + " " + (player ? "" : style.waiting)}>
+          {player ? <strong>{player}</strong> : "Ожидание..."}
+        </span>
       </div>
     );
   };
@@ -101,8 +104,18 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
           {isVertical ? (
             <>
               {title()}
-              {showPlayers()}
-              <Field fieldSize={fieldSize} roomCreator={roomCreator} roomGuest={roomGuest} />
+              <div className={style.players}>
+                {showPlayer(roomCreator, 1)}
+                {showPlayer(roomGuest, 2)}
+              </div>
+              <Field
+                fieldSize={fieldSize}
+                roomCreator={roomCreator}
+                roomGuest={roomGuest}
+                field={field}
+                sendCoordinates={sendCoordinates}
+                userId={userId}
+              />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
                   roomCreator={roomCreator}
@@ -126,7 +139,10 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
             <>
               <div>
                 {title()}
-                {showPlayers()}
+                <div className={style.players}>
+                  {showPlayer(roomCreator, 1)}
+                  {showPlayer(roomGuest, 2)}
+                </div>
                 <Chat
                   roomCreator={roomCreator}
                   roomGuest={roomGuest}
@@ -137,7 +153,14 @@ const Room: FC<RoomProps> = ({ nickname, roomChat, roomCreator, roomGuest, sendC
                   sendChatMessage={sendChatMessage}
                 />
               </div>
-              <Field fieldSize={fieldSize} roomCreator={roomCreator} roomGuest={roomGuest} />
+              <Field
+                fieldSize={fieldSize}
+                roomCreator={roomCreator}
+                roomGuest={roomGuest}
+                field={field}
+                sendCoordinates={sendCoordinates}
+                userId={userId}
+              />
             </>
           )}
         </div>
