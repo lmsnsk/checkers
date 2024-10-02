@@ -16,22 +16,29 @@ export interface RoomChat {
   date: string;
 }
 
+interface RoomI {
+  roomId: number;
+  roomName: string;
+  created: string;
+  playersInRoom: { nickname: string; userId: number; pieceType: string }[];
+}
+
 const App: FC = () => {
   const [roomList, setRoomlist] = useState<RoomListItem[]>([]);
   const [roomChat, setRoomChat] = useState<RoomChat[]>([]);
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState<string>("");
   const [userId, setUserId] = useState<number | undefined>();
-  const [creator, setCreator] = useState(false);
-  const [inGame, setInGame] = useState(false);
-  const [roomCreator, setRoomCreator] = useState("");
-  const [roomGuest, setRoomGuest] = useState("");
+  const [creator, setCreator] = useState<boolean>(false);
+  const [inGame, setInGame] = useState<boolean>(false);
+  const [roomCreator, setRoomCreator] = useState<string>("");
+  const [roomGuest, setRoomGuest] = useState<string>("");
   const [field, setField] = useState<number[][]>(Array(8).fill(Array(8).fill(0)));
 
   const socket: WebSocket | null = useSocket();
 
   const createRoom = (nickname: string) => {
     if (socket) {
-      socket.send(JSON.stringify({ action: "create_room", nickname, userId, piece_type: "white" }));
+      socket.send(JSON.stringify({ action: "create_room", nickname, userId }));
     }
   };
 
@@ -68,7 +75,7 @@ const App: FC = () => {
       switch (data.action) {
         case "room_list":
           setRoomlist(
-            data.rooms.map((room: any) => ({
+            data.rooms.map((room: RoomI) => ({
               roomId: room.roomId,
               roomName: room.roomName,
               playersInRoom: room.playersInRoom.length,

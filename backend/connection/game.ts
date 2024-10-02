@@ -1,6 +1,6 @@
 import { reverseCoordinates, reverseField } from "./../lib/helpers";
 import { WebSocket } from "ws";
-import { Session, User } from "../lib/types";
+import { CoordinatesData, Session, User, JoinRoomData } from "../lib/types";
 
 const gameState: number[][] = [
   [0, 1, 0, 1, 0, 1, 0, 1],
@@ -13,7 +13,7 @@ const gameState: number[][] = [
   [2, 0, 2, 0, 2, 0, 2, 0],
 ];
 
-export const sendGameState = (ws: WebSocket, sessions: Session[], data: any) => {
+export const sendGameState = (ws: WebSocket, sessions: Session[], data: JoinRoomData) => {
   let isSend = false;
 
   sessions.forEach((session) => {
@@ -27,7 +27,7 @@ export const sendGameState = (ws: WebSocket, sessions: Session[], data: any) => 
   });
 };
 
-export const coordinates = (ws: WebSocket, users: Map<number, User>, data: any) => {
+export const coordinates = (ws: WebSocket, users: Map<number, User>, data: CoordinatesData) => {
   users.forEach((_, key) => {
     if (key === data.userId) {
       console.log(data.creator ? data.coordinates : reverseCoordinates(data.coordinates));

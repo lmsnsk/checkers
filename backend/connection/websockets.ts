@@ -38,6 +38,8 @@ export const wssConnection = () => {
     ws.on("message", (message) => {
       const data = JSON.parse(message.toString());
 
+      console.log(data);
+
       switch (data.action) {
         case "create_room":
           createRoom(ws, data, users, rooms, sessions);

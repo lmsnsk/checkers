@@ -1,7 +1,7 @@
 import { dateToString } from "../lib/helpers";
-import { Session } from "../lib/types";
+import { ChatMessageData, Session } from "../lib/types";
 
-export const messages = (data: any, sessions: Session[]) => {
+export const messages = (data: ChatMessageData, sessions: Session[]) => {
   sessions.forEach((session) => {
     const creator = session.players.creator;
     const guest = session.players.guest;

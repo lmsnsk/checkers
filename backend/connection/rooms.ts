@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { Room, Session, User } from "../lib/types";
+import { CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
 import { dateToString } from "../lib/helpers";
 
 export const sendAllUsersRoomList = (users: Map<number, User>, rooms: Room[]) => {
@@ -10,7 +10,7 @@ export const sendAllUsersRoomList = (users: Map<number, User>, rooms: Room[]) =>
 
 export const createRoom = (
   ws: WebSocket,
-  data: any,
+  data: CreateRoomData,
   users: Map<number, User>,
   rooms: Room[],
   sessions: Session[]
@@ -43,14 +43,15 @@ export const createRoom = (
     JSON.stringify({
       action: "to_room",
       nickname: data.nickname,
-      roomId: data.roomId,
+      userId: data.userId,
+      roomId,
     })
   );
 };
 
 export const joinRoom = (
   ws: WebSocket,
-  data: any,
+  data: JoinRoomData,
   users: Map<number, User>,
   rooms: Room[],
   sessions: Session[]
@@ -85,6 +86,7 @@ export const joinRoom = (
       action: "to_room",
       nickname: data.nickname,
       roomId: data.roomId,
+      userId: data.userId,
     })
   );
 };
