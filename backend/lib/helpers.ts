@@ -16,5 +16,16 @@ export const reverseField = (field: number[][]): number[][] => {
 };
 
 export const reverseCoordinates = (coordinates: { x: number; y: number }) => {
-  return { x: 7 - coordinates.y, y: 7 - coordinates.x };
+  return { x: 7 - coordinates.x, y: 7 - coordinates.y };
 };
+
+export const startField: number[][] = [
+  [0, 1, 0, 1, 0, 1, 0, 1],
+  [1, 0, 1, 0, 1, 0, 1, 0],
+  [0, 1, 0, 1, 0, 1, 0, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [2, 0, 2, 0, 2, 0, 2, 0],
+  [0, 2, 0, 2, 0, 2, 0, 2],
+  [2, 0, 2, 0, 2, 0, 2, 0],
+];

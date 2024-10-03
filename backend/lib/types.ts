@@ -1,4 +1,3 @@
-import { coordinates } from "./../connection/game";
 import { WebSocket } from "ws";
 
 export interface Room {
@@ -17,6 +16,9 @@ export interface User {
 export interface Session {
   roomId: number;
   created: string;
+  gameState: {
+    field: number[][];
+  };
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
     guest?: { ws: WebSocket; userId: number; nickname: string; pieceType: string };

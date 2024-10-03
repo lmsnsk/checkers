@@ -2,27 +2,18 @@ import { reverseCoordinates, reverseField } from "./../lib/helpers";
 import { WebSocket } from "ws";
 import { CoordinatesData, Session, User, JoinRoomData } from "../lib/types";
 
-const gameState: number[][] = [
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 1, 0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-  [0, 2, 0, 2, 0, 2, 0, 2],
-  [2, 0, 2, 0, 2, 0, 2, 0],
-];
-
 export const sendGameState = (ws: WebSocket, sessions: Session[], data: JoinRoomData) => {
-  let isSend = false;
-
   sessions.forEach((session) => {
-    if (session.roomId === data.roomId && !isSend) {
-      ws.send(JSON.stringify({ action: "game_state", gameState }));
-      session.players.creator.ws.send(
-        JSON.stringify({ action: "game_state", gameState: reverseField(gameState) })
+    if (session.roomId === data.roomId) {
+      ws.send(
+        JSON.stringify({ action: "game_state", gameState: { field: session.gameState.field } })
       );
-      isSend = true;
+      session.players.creator.ws.send(
+        JSON.stringify({
+          action: "game_state",
+          gameState: { field: reverseField(session.gameState.field) },
+        })
+      );
     }
   });
 };

@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from "react";
 
 import Lobby from "./pages/Lobby";
-import Room from "./pages/Room";
 import { useSocket } from "./lib/hooks";
+import { Data, RoomI } from "./lib/types";
+import Room from "./pages/Room";
 
 interface RoomListItem {
   roomId: number;
@@ -14,13 +15,6 @@ export interface RoomChat {
   text: string;
   nickname: string;
   date: string;
-}
-
-interface RoomI {
-  roomId: number;
-  roomName: string;
-  created: string;
-  playersInRoom: { nickname: string; userId: number; pieceType: string }[];
 }
 
 const App: FC = () => {
@@ -68,36 +62,41 @@ const App: FC = () => {
 
   if (socket) {
     socket.onmessage = (e) => {
-      const data = JSON.parse(e.data);
+      const data: Data = JSON.parse(e.data);
 
       console.log(data);
 
       switch (data.action) {
         case "room_list":
-          setRoomlist(
-            data.rooms.map((room: RoomI) => ({
-              roomId: room.roomId,
-              roomName: room.roomName,
-              playersInRoom: room.playersInRoom.length,
-            }))
-          );
+          if (data.rooms) {
+            setRoomlist(
+              data.rooms!.map((room: RoomI) => ({
+                roomId: room.roomId,
+                roomName: room.roomName,
+                playersInRoom: room.playersInRoom.length,
+              }))
+            );
+          }
           break;
         case "create_user":
           setUserId(data.userId);
           break;
         case "to_room":
-          setNickname(data.nickname);
+          if (data.nickname) setNickname(data.nickname);
           setInGame(true);
           break;
         case "current_session":
-          setRoomCreator(data.session.players.creator.nickname);
-          setRoomGuest(data.session.players.guest?.nickname ?? "");
+          if (data.session) {
+            setRoomCreator(data.session.players.creator.nickname);
+            setRoomGuest(data.session.players.guest?.nickname ?? "");
+            setField(data.session.gameState.field);
+          }
           break;
         case "chat_message":
-          setRoomChat(data.chat);
+          if (data.chat) setRoomChat(data.chat);
           break;
         case "game_state":
-          updateField(data.gameState);
+          if (data.gameState) updateField(data.gameState.field);
           break;
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);

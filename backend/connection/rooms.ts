@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import { CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
-import { dateToString } from "../lib/helpers";
+import { dateToString, startField } from "../lib/helpers";
 
 export const sendAllUsersRoomList = (users: Map<number, User>, rooms: Room[]) => {
   users.forEach((user) => {
@@ -29,6 +29,9 @@ export const createRoom = (
   const currentSession: Session = {
     roomId: roomId,
     created: dateToString(),
+    gameState: {
+      field: startField,
+    },
     players: {
       creator: { ws: ws, userId: data.userId, nickname: data.nickname, pieceType: "white" },
     },
