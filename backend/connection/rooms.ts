@@ -1,3 +1,4 @@
+import { ClickState } from "./../lib/types";
 import { WebSocket } from "ws";
 import { CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
 import { dateToString, startField } from "../lib/helpers";
@@ -30,6 +31,7 @@ export const createRoom = (
     roomId: roomId,
     created: dateToString(),
     gameState: {
+      turn: "creator",
       field: startField,
     },
     players: {
@@ -80,6 +82,8 @@ export const joinRoom = (
       ws.send(JSON.stringify({ action: "current_session", session }));
       session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
     }
+    session.gameState.creatorClickState = ClickState.START;
+    session.gameState.guestClickState = ClickState.START;
   });
 
   sendAllUsersRoomList(users, rooms);

@@ -1,5 +1,27 @@
 import { WebSocket } from "ws";
 
+export enum ClickState {
+  START,
+  FIRSTCLICK,
+  END,
+}
+/*
+0 - пустая
+1 - белая
+2 - черная
+3 - белая королева
+4 - черная королева
+*/
+
+export enum FigureKind {
+  EMPTY,
+  WHITE,
+  BLACK,
+  WHITE_KING,
+  BLACK_KING,
+  POSSIBLE_TURN = 9,
+}
+
 export interface Room {
   roomId: number;
   roomName: string;
@@ -17,7 +39,10 @@ export interface Session {
   roomId: number;
   created: string;
   gameState: {
-    field: number[][];
+    turn: "creator" | "guest";
+    creatorClickState?: ClickState;
+    guestClickState?: ClickState;
+    field: FigureKind[][];
   };
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
@@ -45,9 +70,11 @@ export interface ChatMessageData {
   nickname: string;
 }
 
+export type Coord = { x: number; y: number };
+
 export interface CoordinatesData {
   action: "coordinates";
-  coordinates: { x: number; y: number };
+  coordinates: Coord;
   userId: number;
   creator: boolean;
 }

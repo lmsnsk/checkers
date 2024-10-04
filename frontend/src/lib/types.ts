@@ -9,6 +9,7 @@ export type Session = {
   roomId: number;
   created: string;
   gameState: {
+    turn: "creator" | "guest";
     field: number[][];
   };
   players: {

@@ -3,12 +3,9 @@ import { WebSocket, WebSocketServer } from "ws";
 import { messages } from "./chat";
 import { userIdGenerator } from "../lib/helpers";
 import { Room, Session, User } from "../lib/types";
-import { createRoom, joinRoom, sendAllUsersRoomList } from "./rooms";
-import { coordinates, sendGameState } from "./game";
-
-const rooms: Room[] = [];
-const sessions: Session[] = [];
-const users = new Map<number, User>();
+import { createRoom, joinRoom } from "./rooms";
+import { coordinates, sendStartGameState } from "./game";
+import { rooms, sessions, users } from "../database/database";
 
 const onConnection = (ws: WebSocket) => {
   // console.log("Client connected");
@@ -46,14 +43,13 @@ export const wssConnection = () => {
           break;
         case "join_room":
           joinRoom(ws, data, users, rooms, sessions);
-          sendGameState(ws, sessions, data);
+          sendStartGameState(ws, sessions, data);
           break;
         case "chat_message":
           messages(data, sessions);
           break;
         case "coordinates":
-          // console.log(data.coordinates);
-          coordinates(ws, users, data);
+          coordinates(ws, sessions, data);
           break;
       }
     });

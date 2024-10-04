@@ -1,3 +1,5 @@
+import { FigureKind } from "./types";
+
 let userCounter = 0;
 
 export const userIdGenerator = () => {
@@ -19,13 +21,13 @@ export const reverseCoordinates = (coordinates: { x: number; y: number }) => {
   return { x: 7 - coordinates.x, y: 7 - coordinates.y };
 };
 
-export const startField: number[][] = [
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [1, 0, 1, 0, 1, 0, 1, 0],
-  [0, 1, 0, 1, 0, 1, 0, 1],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [2, 0, 2, 0, 2, 0, 2, 0],
+export const startField: FigureKind[][] = [
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0],
+  [0, 2, 0, 2, 0, 2, 0, 2],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [1, 0, 1, 0, 1, 0, 1, 0],
+  [0, 1, 0, 1, 0, 1, 0, 1],
+  [1, 0, 1, 0, 1, 0, 1, 0],
 ];

@@ -1,4 +1,4 @@
-function foo(num) {
+function computerCount(num) {
   const result = num + " компьютер";
   let add;
   if (num % 10 === 1 && num % 100 !== 11 && num !== 11) {
