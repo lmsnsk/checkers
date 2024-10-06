@@ -41,5 +41,6 @@ export type Data = {
   gameState?: { field: FigureKind[][] };
   session?: Session;
   rooms?: RoomI[];
+  winner?: "creator" | "guest";
   chat?: { nickname: string; date: string; text: string }[];
 };

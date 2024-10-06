@@ -40,6 +40,10 @@ export interface Session {
   roomId: number;
   created: string;
   gameState: {
+    winner: "creator" | "guest" | undefined;
+    whiteEated: number;
+    blackEated: number;
+    checkersForEat: Coord[];
     turn: "creator" | "guest";
     firstClickCoords?: Coord;
     field: FigureKind[][];
@@ -50,6 +54,8 @@ export interface Session {
   };
   chat: { nickname: string; date: string; text: string }[];
 }
+
+export type GameState = Session["gameState"];
 
 export interface CreateRoomData {
   action: "create_room";

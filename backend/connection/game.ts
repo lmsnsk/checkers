@@ -1,8 +1,8 @@
 import { WebSocket } from "ws";
 
 import { reverseField } from "./../lib/helpers";
-import { CoordinatesData, Session, JoinRoomData } from "../lib/types";
-import { firstFieldClick, turn } from "../gameLogic/gameLogic";
+import { CoordinatesData, Session, JoinRoomData, GameState } from "../lib/types";
+import { fieldClick, turn } from "../gameLogic/gameLogic";
 
 export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: JoinRoomData) => {
   sessions.forEach((session) => {
@@ -22,11 +22,7 @@ export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: Joi
   });
 };
 
-const sendGameStateToCurrentPlayer = (
-  ws: WebSocket,
-  gameState: Session["gameState"],
-  isCreator: boolean
-) => {
+const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState, isCreator: boolean) => {
   ws.send(
     JSON.stringify({
       action: "game_state",
@@ -53,6 +49,21 @@ const sendGameStateToBothPlayer = (session: Session, turn: "creator" | "guest") 
   );
 };
 
+const endGame = (session: Session) => {
+  session.players.creator.ws.send(
+    JSON.stringify({
+      action: "end_game",
+      winner: session.gameState.winner,
+    })
+  );
+  session.players.guest?.ws.send(
+    JSON.stringify({
+      action: "end_game",
+      winner: session.gameState.winner,
+    })
+  );
+};
+
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
   sessions.forEach((session) => {
     const gameState = session.gameState;
@@ -65,18 +76,17 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     }
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
-      console.log(gameState.firstClickCoords);
-
-      if (turn(gameState, data.coordinates, isCreator)) {
+      if (turn(data.coordinates, gameState, isCreator)) {
         sendGameStateToBothPlayer(session, gameState.turn);
         gameState.turn = isCreator ? "guest" : "creator";
         gameState.field = reverseField(gameState.field);
         return;
       }
-      if (firstFieldClick(data.coordinates, gameState.field, isCreator)) {
+      if (fieldClick(data.coordinates, gameState, isCreator)) {
         sendGameStateToCurrentPlayer(ws, gameState, isCreator);
         gameState.firstClickCoords = data.coordinates;
       }
+      if (gameState.winner) endGame(session);
     }
   });
 };

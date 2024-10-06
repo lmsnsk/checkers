@@ -98,6 +98,12 @@ const App: FC = () => {
         case "game_state":
           if (data.gameState) updateField(data.gameState.field);
           break;
+        case "end_game":
+          if (data.winner === "creator" && creator) {
+            /////////////
+          } else {
+          }
+          break;
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);
           break;
