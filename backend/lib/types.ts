@@ -5,6 +5,7 @@ export enum ClickState {
   FIRSTCLICK,
   END,
 }
+
 /*
 0 - пустая
 1 - белая
@@ -19,7 +20,7 @@ export enum FigureKind {
   BLACK,
   WHITE_KING,
   BLACK_KING,
-  POSSIBLE_TURN = 9,
+  POSSIBLE_TURN,
 }
 
 export interface Room {
@@ -40,8 +41,6 @@ export interface Session {
   created: string;
   gameState: {
     turn: "creator" | "guest";
-    creatorClickState?: ClickState;
-    guestClickState?: ClickState;
     firstClickCoords?: Coord;
     field: FigureKind[][];
   };

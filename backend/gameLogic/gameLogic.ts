@@ -158,14 +158,27 @@ const checkNextMove = (
 };
 
 export const turn = (gameState: Session["gameState"], coord: Coord, isCreator: boolean) => {
-  if (
-    gameState.firstClickCoords &&
-    gameState.field[coord.y][coord.x] === FigureKind.POSSIBLE_TURN
-  ) {
-    gameState.field[coord.y][coord.x] = isCreator ? FigureKind.WHITE : FigureKind.BLACK;
-    gameState.field[gameState.firstClickCoords.y][gameState.firstClickCoords.x] = FigureKind.EMPTY;
+  const prevCoords = gameState.firstClickCoords;
 
-    if (coord.y === 0) {
+  if (prevCoords && gameState.field[coord.y][coord.x] === FigureKind.POSSIBLE_TURN) {
+    if (isCreator) {
+      gameState.field[coord.y][coord.x] =
+        gameState.field[prevCoords.y][prevCoords.x] === FigureKind.WHITE_KING
+          ? FigureKind.WHITE_KING
+          : FigureKind.WHITE;
+    } else {
+      gameState.field[coord.y][coord.x] =
+        gameState.field[prevCoords.y][prevCoords.x] === FigureKind.BLACK_KING
+          ? FigureKind.BLACK_KING
+          : FigureKind.BLACK;
+    }
+    gameState.field[prevCoords.y][prevCoords.x] = FigureKind.EMPTY;
+
+    if (
+      coord.y === 0 ||
+      gameState.field[prevCoords.y][prevCoords.x] === FigureKind.BLACK_KING ||
+      gameState.field[prevCoords.y][prevCoords.x] === FigureKind.WHITE_KING
+    ) {
       gameState.field[coord.y][coord.x] = isCreator ? FigureKind.WHITE_KING : FigureKind.BLACK_KING;
     }
     clearTempCheckers(gameState.field);

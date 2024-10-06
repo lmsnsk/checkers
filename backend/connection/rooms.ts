@@ -82,8 +82,6 @@ export const joinRoom = (
       ws.send(JSON.stringify({ action: "current_session", session }));
       session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
     }
-    session.gameState.creatorClickState = ClickState.START;
-    session.gameState.guestClickState = ClickState.START;
   });
 
   sendAllUsersRoomList(users, rooms);

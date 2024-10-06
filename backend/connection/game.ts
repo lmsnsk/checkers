@@ -1,7 +1,7 @@
 import { WebSocket } from "ws";
 
-import { reverseCoordinates, reverseField } from "./../lib/helpers";
-import { CoordinatesData, Session, User, JoinRoomData, ClickState, FigureKind } from "../lib/types";
+import { reverseField } from "./../lib/helpers";
+import { CoordinatesData, Session, JoinRoomData } from "../lib/types";
 import { firstFieldClick, turn } from "../gameLogic/gameLogic";
 
 export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: JoinRoomData) => {
@@ -16,7 +16,6 @@ export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: Joi
       session.players.creator.ws.send(
         JSON.stringify({
           action: "game_state",
-          gameState: { field: session.gameState.field },
         })
       );
     }
@@ -66,6 +65,8 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     }
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
+      console.log(gameState.firstClickCoords);
+
       if (turn(gameState, data.coordinates, isCreator)) {
         sendGameStateToBothPlayer(session, gameState.turn);
         gameState.turn = isCreator ? "guest" : "creator";

@@ -1,3 +1,12 @@
+export enum FigureKind {
+  EMPTY,
+  WHITE,
+  BLACK,
+  WHITE_KING,
+  BLACK_KING,
+  POSSIBLE_TURN,
+}
+
 export type RoomI = {
   roomId: number;
   roomName: string;
@@ -10,7 +19,7 @@ export type Session = {
   created: string;
   gameState: {
     turn: "creator" | "guest";
-    field: number[][];
+    field: FigureKind[][];
   };
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
@@ -29,7 +38,7 @@ export type Data = {
   creator?: boolean;
   inGame?: boolean;
   pieceType?: string;
-  gameState?: { field: number[][] };
+  gameState?: { field: FigureKind[][] };
   session?: Session;
   rooms?: RoomI[];
   chat?: { nickname: string; date: string; text: string }[];
