@@ -17,6 +17,7 @@ interface RoomProps {
   roomGuest: string;
   field: number[][];
   userId: number | undefined;
+  creator: boolean;
   sendChatMessage: (text: string) => void;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
@@ -28,6 +29,7 @@ const Room: FC<RoomProps> = ({
   roomGuest,
   field,
   userId,
+  creator,
   sendChatMessage,
   sendCoordinates,
 }) => {
@@ -115,6 +117,7 @@ const Room: FC<RoomProps> = ({
                 field={field}
                 sendCoordinates={sendCoordinates}
                 userId={userId}
+                creator={creator}
               />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
@@ -160,6 +163,7 @@ const Room: FC<RoomProps> = ({
                 field={field}
                 sendCoordinates={sendCoordinates}
                 userId={userId}
+                creator={creator}
               />
             </>
           )}

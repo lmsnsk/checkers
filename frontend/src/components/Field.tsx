@@ -1,5 +1,4 @@
 import { useSound } from "../lib/hooks";
-import { clearTempCheckers } from "../lib/utils";
 import { FC, Fragment, MouseEvent, useState } from "react";
 import Figures from "./Figures";
 
@@ -33,6 +32,7 @@ interface FieldProps {
   roomGuest: string;
   field: number[][];
   userId: number | undefined;
+  creator: boolean;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
@@ -42,6 +42,7 @@ const Field: FC<FieldProps> = ({
   roomGuest,
   field,
   userId,
+  creator,
   sendCoordinates,
 }) => {
   const [repeatMove, setRepeatMove] = useState(false);
@@ -50,110 +51,12 @@ const Field: FC<FieldProps> = ({
 
   // const playSound = useSound("../assets/sounds/checker.mp3");
 
-  const checkFreeMove = (x: number, y: number) => {
-    if (y === 0) return;
-    if (x > 0 && field[y - 1][x - 1] === 0) {
-      field[y - 1][x - 1] = 9;
-    }
-    if (x < 7 && field[y - 1][x + 1] === 0) {
-      field[y - 1][x + 1] = 9;
-    }
-  };
-
-  const checkFreeQueenMove = (x: number, y: number) => {
-    for (let i = 1; x - i >= 0 && y - i >= 0 && field[y - i][x - i] === 0; i++) {
-      field[y - i][x - i] = 9;
-    }
-    for (let i = 1; x + i <= 7 && y - i >= 0 && field[y - i][x + i] === 0; i++) {
-      field[y - i][x + i] = 9;
-    }
-    for (let i = 1; x - i >= 0 && y + i <= 7 && field[y + i][x - i] === 0; i++) {
-      field[y + i][x - i] = 9;
-    }
-    for (let i = 1; x + i <= 7 && y + i <= 7 && field[y + i][x + i] === 0; i++) {
-      field[y + i][x + i] = 9;
-    }
-  };
-
-  const checkFightMove = (x: number, y: number): boolean => {
-    const enemyColor = playerColor === 1 ? 2 : 1;
-    let isFighting = false;
-
-    if (field[y - 1][x - 1] === enemyColor && y - 2 >= 0 && field[y - 2][x - 2] === 0) {
-      field[y - 2][x - 2] = 9;
-      isFighting = true;
-    }
-    if (field[y - 1][x + 1] === enemyColor && y - 2 >= 0 && field[y - 2][x + 2] === 0) {
-      field[y - 2][x + 2] = 9;
-      isFighting = true;
-    }
-    if (y < 6 && field[y + 1][x - 1] === enemyColor && field[y + 2][x - 2] === 0) {
-      field[y + 2][x - 2] = 9;
-      isFighting = true;
-    }
-    if (y < 6 && field[y + 1][x + 1] === enemyColor && field[y + 2][x + 2] === 0) {
-      field[y + 2][x + 2] = 9;
-      isFighting = true;
-    }
-    return isFighting;
-  };
-
-  const checkFightQueenMove = (x: number, y: number): boolean => {
-    const enemyColor = playerColor === 1 ? 2 : 1;
-    let isFighting = false;
-    let firstCheck = false;
-
-    let i = 1;
-    while (y - i >= 0 && x - i >= 0) {
-      if (field[y - i][x - i] === playerColor) break;
-      if (field[y - i][x - i] === 0) field[y - i][x - i] = 9;
-      if (field[y - i][x - i] === enemyColor) {
-        if (!firstCheck && y - i > 0 && field[y - i - 1][x - i - 1] === 0) {
-          clearTempCheckers(field);
-          firstCheck = true;
-          isFighting = true;
-        } else {
-          break;
-        }
-      }
-      i++;
-    }
-    return isFighting;
-  };
-
-  const checkNextMove = (x: number, y: number, isQueen: boolean) => {
-    if (isQueen) {
-      if (!checkFightQueenMove(x, y)) checkFreeQueenMove(x, y);
-    } else {
-      if (!checkFightMove(x, y)) checkFreeMove(x, y);
-    }
-    // checkMove(x, y);
-  };
-
   const onClickHandler = (e: MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = Math.floor((e.clientX - rect.left) / (rect.width / 8));
     const y = Math.floor((e.clientY - rect.top) / (rect.height / 8));
 
     sendCoordinates(x, y, userId);
-    // if (!currentChecker && field[y][x] === 0) {
-    //   return;
-    // }
-    // if (field[y][x] === playerColor) {
-    //   clearTempCheckers(field);
-    //   setCurrentChecker({ x, y, color: field[y][x] as CheckerType["color"], isQueen: true });
-    //   checkNextMove(x, y, true); // проверка дамки
-    //   // setField([...field]);
-    //   return;
-    // }
-    // if (currentChecker && field[y][x] === 9) {
-    //   clearTempCheckers(field); // придет с сервера, не нужно очищать
-    //   field[currentChecker.y][currentChecker.x] = 0;
-    //   field[y][x] = currentChecker.color;
-    //   // setField([...field]);
-    //   setCurrentChecker(null);
-    //   // playSound();
-    // }
   };
 
   const drawField = () => {
@@ -211,7 +114,7 @@ const Field: FC<FieldProps> = ({
             onClick={onClickHandler}
           >
             {drawField()}
-            <Figures field={field} fieldSize={fieldSize} />
+            <Figures field={field} fieldSize={fieldSize} creator={creator} />
           </div>
           {drawMarginColumn("right")}
         </div>

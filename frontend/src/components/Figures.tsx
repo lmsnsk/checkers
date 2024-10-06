@@ -5,6 +5,7 @@ import style from "./Figures.module.scss";
 interface FiguresProps {
   fieldSize: number;
   field: number[][];
+  creator: boolean;
 }
 
 const BL_IN = "#333";
@@ -12,7 +13,7 @@ const BL_OUT = "black";
 const WH_IN = "#ccc";
 const WH_OUT = "white";
 
-const Figures: FC<FiguresProps> = ({ fieldSize, field }) => {
+const Figures: FC<FiguresProps> = ({ fieldSize, field, creator }) => {
   const cellSize = fieldSize / 8;
   const checkerSize = cellSize * 0.8;
 
@@ -23,8 +24,8 @@ const Figures: FC<FiguresProps> = ({ fieldSize, field }) => {
           if (cell === 0) {
             return null;
           }
-          const outerColor = cell === 2 || cell === 9 ? BL_OUT : WH_OUT;
-          const innerColor = cell === 2 || cell === 9 ? BL_IN : WH_IN;
+          const outerColor = cell === 2 || cell === 4 || (cell === 9 && !creator) ? BL_OUT : WH_OUT;
+          const innerColor = cell === 2 || cell === 4 || (cell === 9 && !creator) ? BL_IN : WH_IN;
 
           return (
             <div

@@ -1,8 +1,8 @@
 import { WebSocket } from "ws";
 
-import { reverseField } from "./../lib/helpers";
+import { reverseCoordinates, reverseField } from "./../lib/helpers";
 import { CoordinatesData, Session, User, JoinRoomData, ClickState, FigureKind } from "../lib/types";
-import { firstFieldClick } from "../gameLogic/gameLogic";
+import { firstFieldClick, turn } from "../gameLogic/gameLogic";
 
 export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: JoinRoomData) => {
   sessions.forEach((session) => {
@@ -23,22 +23,58 @@ export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: Joi
   });
 };
 
-const sendGameState = (ws: WebSocket, gameState: Session["gameState"]) => {
-  ws.send(JSON.stringify({ action: "game_state", gameState: { field: gameState.field } }));
+const sendGameStateToCurrentPlayer = (
+  ws: WebSocket,
+  gameState: Session["gameState"],
+  isCreator: boolean
+) => {
+  ws.send(
+    JSON.stringify({
+      action: "game_state",
+      gameState: { field: isCreator ? gameState.field : gameState.field },
+    })
+  );
+};
+
+const sendGameStateToBothPlayer = (session: Session, turn: "creator" | "guest") => {
+  const field = session.gameState.field;
+  const reversedField = reverseField(session.gameState.field);
+
+  session.players.creator.ws.send(
+    JSON.stringify({
+      action: "game_state",
+      gameState: { field: turn === "creator" ? field : reversedField },
+    })
+  );
+  session.players.guest?.ws.send(
+    JSON.stringify({
+      action: "game_state",
+      gameState: { field: turn === "guest" ? field : reversedField },
+    })
+  );
 };
 
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
   sessions.forEach((session) => {
     const gameState = session.gameState;
     const creator = session.players.creator;
+    const guest = session.players.guest;
+    const isCreator = creator.userId === data.userId;
 
-    if (creator.userId === data.userId && gameState.turn === "creator") {
-      if (gameState.creatorClickState === ClickState.START) {
-        if (firstFieldClick(data.coordinates, gameState.field, true)) {
-          sendGameState(ws, gameState);
-          gameState.creatorClickState = ClickState.FIRSTCLICK;
-        }
-      } else if (gameState.creatorClickState === ClickState.FIRSTCLICK) {
+    if ((isCreator && gameState.turn === "guest") || (!isCreator && gameState.turn === "creator")) {
+      return;
+    }
+
+    if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
+      if (turn(gameState, data.coordinates, isCreator)) {
+        sendGameStateToBothPlayer(session, gameState.turn);
+        gameState.turn = isCreator ? "guest" : "creator";
+        gameState.field = reverseField(gameState.field);
+        return;
+      }
+      if (firstFieldClick(data.coordinates, gameState.field, isCreator)) {
+        sendGameStateToCurrentPlayer(ws, gameState, isCreator);
+        gameState.firstClickCoords = data.coordinates;
       }
     }
   });

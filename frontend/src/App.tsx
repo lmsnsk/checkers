@@ -127,6 +127,7 @@ const App: FC = () => {
           field={field}
           sendCoordinates={sendCoordinates}
           userId={userId}
+          creator={creator}
         />
       ) : (
         <Lobby

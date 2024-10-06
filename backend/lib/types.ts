@@ -42,6 +42,7 @@ export interface Session {
     turn: "creator" | "guest";
     creatorClickState?: ClickState;
     guestClickState?: ClickState;
+    firstClickCoords?: Coord;
     field: FigureKind[][];
   };
   players: {

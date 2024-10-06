@@ -1,6 +1,27 @@
-import { Coord, FigureKind } from "../lib/types";
+import { Coord, FigureKind, Session } from "../lib/types";
 
-export const clearTempCheckers = (field: FigureKind[][]) => {
+const isKing = (field: FigureKind[][], coord: Coord) => {
+  return (
+    field[coord.y][coord.x] === FigureKind.WHITE_KING ||
+    field[coord.y][coord.x] === FigureKind.BLACK_KING
+  );
+};
+
+const isWhite = (field: FigureKind[][], coord: Coord) => {
+  return (
+    field[coord.y][coord.x] === FigureKind.WHITE ||
+    field[coord.y][coord.x] === FigureKind.WHITE_KING
+  );
+};
+
+const isBlack = (field: FigureKind[][], coord: Coord) => {
+  return (
+    field[coord.y][coord.x] === FigureKind.BLACK ||
+    field[coord.y][coord.x] === FigureKind.BLACK_KING
+  );
+};
+
+const clearTempCheckers = (field: FigureKind[][]) => {
   for (let y = 0; y < 8; y++) {
     for (let x = 0; x < 8; x++) {
       if (field[y][x] === FigureKind.POSSIBLE_TURN) {
@@ -35,15 +56,14 @@ const checkFreeKingMove = (field: FigureKind[][], x: number, y: number) => {
   }
 };
 
-const checkFightMove = (field: FigureKind[][], x: number, y: number): boolean => {
-  const enemy =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.BLACK
-      : FigureKind.WHITE;
-  const enemyKing =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.BLACK_KING
-      : FigureKind.WHITE_KING;
+const checkFightMove = (
+  field: FigureKind[][],
+  x: number,
+  y: number,
+  isCreator: boolean
+): boolean => {
+  const enemy = isCreator ? FigureKind.BLACK : FigureKind.WHITE;
+  const enemyKing = isCreator ? FigureKind.BLACK_KING : FigureKind.WHITE_KING;
 
   let isFighting = false;
 
@@ -83,34 +103,31 @@ const checkFightMove = (field: FigureKind[][], x: number, y: number): boolean =>
   return isFighting;
 };
 
-const checkFightKingMove = (field: FigureKind[][], x: number, y: number): boolean => {
-  const enemy =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.BLACK
-      : FigureKind.WHITE;
-  const enemyKing =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.BLACK_KING
-      : FigureKind.WHITE_KING;
+const checkFightKingMove = (
+  field: FigureKind[][],
+  x: number,
+  y: number,
+  isCreator: boolean
+): boolean => {
+  const enemy = isCreator ? FigureKind.BLACK : FigureKind.WHITE;
+  const enemyKing = isCreator ? FigureKind.BLACK_KING : FigureKind.WHITE_KING;
 
-  const player =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.WHITE
-      : FigureKind.BLACK;
-  const playerKing =
-    field[y][x] === (FigureKind.WHITE || FigureKind.WHITE_KING)
-      ? FigureKind.WHITE_KING
-      : FigureKind.BLACK_KING;
+  const player = isCreator ? FigureKind.WHITE : FigureKind.BLACK;
+  const playerKing = isCreator ? FigureKind.WHITE_KING : FigureKind.BLACK_KING;
 
   let isFighting = false;
   let firstCheck = false;
 
   let i = 1;
   while (y - i >= 0 && x - i >= 0) {
-    if (field[y - i][x - i] === player || field[y - i][x - i] === playerKing) break;
-    if (field[y - i][x - i] === 0) field[y - i][x - i] = 9;
+    if (field[y - i][x - i] === player || field[y - i][x - i] === playerKing) {
+      break;
+    }
+    if (field[y - i][x - i] === FigureKind.EMPTY) {
+      field[y - i][x - i] = FigureKind.POSSIBLE_TURN;
+    }
     if (field[y - i][x - i] === enemy || field[y - i][x - i] === enemyKing) {
-      if (!firstCheck && y - i > 0 && field[y - i - 1][x - i - 1] === 0) {
+      if (!firstCheck && y - i > 0 && field[y - i - 1][x - i - 1] === FigureKind.EMPTY) {
         clearTempCheckers(field);
         firstCheck = true;
         isFighting = true;
@@ -123,25 +140,44 @@ const checkFightKingMove = (field: FigureKind[][], x: number, y: number): boolea
   return isFighting;
 };
 
-const checkNextMove = (field: FigureKind[][], x: number, y: number, isKing: boolean) => {
+const checkNextMove = (
+  field: FigureKind[][],
+  coord: Coord,
+  isKing: boolean,
+  isCreator: boolean
+) => {
   if (isKing) {
-    if (!checkFightKingMove(field, x, y)) checkFreeKingMove(field, x, y);
+    if (!checkFightKingMove(field, coord.x, coord.y, isCreator)) {
+      checkFreeKingMove(field, coord.x, coord.y);
+    }
   } else {
-    if (!checkFightMove(field, x, y)) checkFreeMove(field, x, y);
+    if (!checkFightMove(field, coord.x, coord.y, isCreator)) {
+      checkFreeMove(field, coord.x, coord.y);
+    }
   }
 };
 
-export const firstFieldClick = (coord: Coord, field: FigureKind[][], isCreator: boolean) => {
+export const turn = (gameState: Session["gameState"], coord: Coord, isCreator: boolean) => {
   if (
-    isCreator
-      ? field[coord.y][coord.x] === FigureKind.WHITE ||
-        field[coord.y][coord.x] === FigureKind.WHITE_KING
-      : field[coord.y][coord.x] === FigureKind.BLACK ||
-        field[coord.y][coord.x] === FigureKind.BLACK_KING
+    gameState.firstClickCoords &&
+    gameState.field[coord.y][coord.x] === FigureKind.POSSIBLE_TURN
   ) {
-    console.log("cool!");
-    clearTempCheckers(field);
-    checkNextMove(field, coord.x, coord.y, true); // проверка дамки
+    gameState.field[coord.y][coord.x] = isCreator ? FigureKind.WHITE : FigureKind.BLACK;
+    gameState.field[gameState.firstClickCoords.y][gameState.firstClickCoords.x] = FigureKind.EMPTY;
+
+    if (coord.y === 0) {
+      gameState.field[coord.y][coord.x] = isCreator ? FigureKind.WHITE_KING : FigureKind.BLACK_KING;
+    }
+    clearTempCheckers(gameState.field);
+    return true;
+  }
+  return false;
+};
+
+export const firstFieldClick = (coord: Coord, field: FigureKind[][], isCreator: boolean) => {
+  if (isCreator ? isWhite(field, coord) : isBlack(field, coord)) {
+    clearTempCheckers(field); // ?
+    checkNextMove(field, coord, isKing(field, coord), isCreator);
     return true;
   }
   return false;
