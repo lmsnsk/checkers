@@ -6,14 +6,6 @@ export enum ClickState {
   END,
 }
 
-/*
-0 - пустая
-1 - белая
-2 - черная
-3 - белая королева
-4 - черная королева
-*/
-
 export enum FigureKind {
   EMPTY,
   WHITE,
@@ -36,6 +28,11 @@ export interface User {
   nickname?: string;
 }
 
+export interface eatVariants {
+  checkerForEat: Coord;
+  possibleTurns: Coord[];
+}
+
 export interface Session {
   roomId: number;
   created: string;
@@ -43,7 +40,7 @@ export interface Session {
     winner: "creator" | "guest" | undefined;
     whiteEated: number;
     blackEated: number;
-    checkersForEat: Coord[];
+    eatVariants: eatVariants[];
     turn: "creator" | "guest";
     firstClickCoords?: Coord;
     field: FigureKind[][];

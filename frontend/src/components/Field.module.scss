@@ -38,3 +38,58 @@
     }
   }
 }
+
+@mixin name() {
+  position: absolute;
+  left: 0;
+  font-size: 20px;
+}
+
+@mixin turn() {
+  position: absolute;
+  right: 0;
+  font-size: 20px;
+}
+
+.enemyName {
+  @include name;
+  top: -34px;
+  color: rgb(224, 165, 165);
+}
+
+.playerName {
+  @include name;
+  bottom: -30px;
+  color: rgb(165, 224, 165);
+}
+
+.youTurn {
+  @include turn;
+  bottom: -30px;
+  color: rgb(165, 224, 165);
+}
+
+.enemyTurn {
+  @include turn;
+  top: -34px;
+  color: rgb(224, 165, 165);
+}
+
+@media (min-width: 768px) {
+  .enemyName,
+  .playerName,
+  .youTurn,
+  .enemyTurn {
+    font-size: 28px;
+  }
+
+  .enemyName,
+  .enemyTurn {
+    top: -44px;
+  }
+
+  .youTurn,
+  .playerName {
+    bottom: -40px;
+  }
+}

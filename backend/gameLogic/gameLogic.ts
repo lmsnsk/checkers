@@ -54,18 +54,22 @@ const checkFreeKingMove = (field: FigureKind[][], x: number, y: number) => {
     field[y - i][x - i] = FigureKind.POSSIBLE_TURN;
     isPossibleTurn = true;
   }
+
   for (let i = 1; x + i <= 7 && y - i >= 0 && field[y - i][x + i] === FigureKind.EMPTY; i++) {
     field[y - i][x + i] = FigureKind.POSSIBLE_TURN;
     isPossibleTurn = true;
   }
+
   for (let i = 1; x - i >= 0 && y + i <= 7 && field[y + i][x - i] === FigureKind.EMPTY; i++) {
     field[y + i][x - i] = FigureKind.POSSIBLE_TURN;
     isPossibleTurn = true;
   }
+
   for (let i = 1; x + i <= 7 && y + i <= 7 && field[y + i][x + i] === FigureKind.EMPTY; i++) {
     field[y + i][x + i] = FigureKind.POSSIBLE_TURN;
     isPossibleTurn = true;
   }
+
   return isPossibleTurn;
 };
 
@@ -88,7 +92,10 @@ const checkFightMove = (
     field[y - 2][x - 2] === FigureKind.EMPTY
   ) {
     field[y - 2][x - 2] = FigureKind.POSSIBLE_TURN;
-    gameState.checkersForEat.push({ x: x - 1, y: y - 1 });
+
+    const possibleTurns = [{ x: x - 2, y: y - 2 }];
+    gameState.eatVariants.push({ checkerForEat: { x: x - 1, y: y - 1 }, possibleTurns });
+
     isFighting = true;
   }
 
@@ -98,7 +105,10 @@ const checkFightMove = (
     field[y - 2][x + 2] === FigureKind.EMPTY
   ) {
     field[y - 2][x + 2] = FigureKind.POSSIBLE_TURN;
-    gameState.checkersForEat.push({ x: x + 1, y: y - 1 });
+
+    const possibleTurns = [{ x: x + 2, y: y - 2 }];
+    gameState.eatVariants.push({ checkerForEat: { x: x + 1, y: y - 1 }, possibleTurns });
+
     isFighting = true;
   }
 
@@ -107,7 +117,10 @@ const checkFightMove = (
     field[y + 2][x - 2] === FigureKind.EMPTY
   ) {
     field[y + 2][x - 2] = FigureKind.POSSIBLE_TURN;
-    gameState.checkersForEat.push({ x: x - 1, y: y + 1 });
+
+    const possibleTurns = [{ x: x - 2, y: y + 2 }];
+    gameState.eatVariants.push({ checkerForEat: { x: x - 1, y: y + 1 }, possibleTurns });
+
     isFighting = true;
   }
 
@@ -116,11 +129,12 @@ const checkFightMove = (
     field[y + 2][x + 2] === FigureKind.EMPTY
   ) {
     field[y + 2][x + 2] = FigureKind.POSSIBLE_TURN;
-    gameState.checkersForEat.push({ x: x + 1, y: y + 1 });
+
+    const possibleTurns = [{ x: x + 2, y: y + 2 }];
+    gameState.eatVariants.push({ checkerForEat: { x: x + 1, y: y + 1 }, possibleTurns });
+
     isFighting = true;
   }
-  console.log(gameState.checkersForEat);
-
   return isFighting;
 };
 
@@ -175,34 +189,16 @@ const checkNextMove = (gameState: GameState, coord: Coord, isKing: boolean, isCr
   }
 };
 
-const eatEnemyChecker = (
-  coords: Coord,
-  gameState: GameState,
-  prevCoords: Coord,
-  isCreator: boolean
-) => {
-  if (gameState.checkersForEat.length === 0 || !gameState.firstClickCoords) return;
+const eatEnemyChecker = (coords: Coord, gameState: GameState, isCreator: boolean) => {
+  if (gameState.eatVariants.length === 0 || !gameState.firstClickCoords) return;
 
-  for (let el of gameState.checkersForEat) {
-    if (
-      (prevCoords.x + 1 === el.x &&
-        prevCoords.y + 1 === el.y &&
-        prevCoords.x + 2 === coords.x &&
-        prevCoords.y + 2 === coords.y) ||
-      (prevCoords.x - 1 === el.x &&
-        prevCoords.y - 1 === el.y &&
-        prevCoords.x - 2 === coords.x &&
-        prevCoords.y - 2 === coords.y) ||
-      (prevCoords.x - 1 === el.x &&
-        prevCoords.y + 1 === el.y &&
-        prevCoords.x - 2 === coords.x &&
-        prevCoords.y + 2 === coords.y) ||
-      (prevCoords.x + 1 === el.x &&
-        prevCoords.y - 1 === el.y &&
-        prevCoords.x + 2 === coords.x &&
-        prevCoords.y - 2 === coords.y)
-    ) {
-      gameState.field[el.y][el.x] = FigureKind.EMPTY;
+  for (let variant of gameState.eatVariants) {
+    let checkEat = false;
+    for (let el of variant.possibleTurns) {
+      if (el.x === coords.x && el.y === coords.y) checkEat = true;
+    }
+    if (checkEat) {
+      gameState.field[variant.checkerForEat.y][variant.checkerForEat.x] = FigureKind.EMPTY;
       isCreator ? gameState.whiteEated++ : gameState.blackEated++;
     }
   }
@@ -240,10 +236,10 @@ export const turn = (coords: Coord, gameState: GameState, isCreator: boolean) =>
     }
 
     gameState.field[prevCoords.y][prevCoords.x] = FigureKind.EMPTY;
-    eatEnemyChecker(coords, gameState, prevCoords, isCreator);
+    eatEnemyChecker(coords, gameState, isCreator);
     clearTempCheckers(gameState.field);
     checkVictoty(gameState);
-    gameState.checkersForEat = [];
+    gameState.eatVariants = [];
     gameState.firstClickCoords = undefined;
 
     return true;

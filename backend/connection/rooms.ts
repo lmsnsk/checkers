@@ -1,5 +1,5 @@
-import { ClickState } from "./../lib/types";
 import { WebSocket } from "ws";
+
 import { CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
 import { dateToString, startField } from "../lib/helpers";
 
@@ -34,9 +34,9 @@ export const createRoom = (
       winner: undefined,
       whiteEated: 0,
       blackEated: 0,
-      checkersForEat: [],
+      eatVariants: [],
       turn: "creator",
-      field: startField,
+      field: startField.map((row) => [...row]),
     },
     players: {
       creator: { ws: ws, userId: data.userId, nickname: data.nickname, pieceType: "white" },

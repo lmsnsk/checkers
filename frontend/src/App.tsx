@@ -27,6 +27,7 @@ const App: FC = () => {
   const [roomCreator, setRoomCreator] = useState<string>("");
   const [roomGuest, setRoomGuest] = useState<string>("");
   const [field, setField] = useState<number[][]>(Array(8).fill(Array(8).fill(0)));
+  const [turn, setTurn] = useState<"creator" | "guest" | undefined>();
 
   const socket: WebSocket | null = useSocket();
 
@@ -90,13 +91,17 @@ const App: FC = () => {
             setRoomCreator(data.session.players.creator.nickname);
             setRoomGuest(data.session.players.guest?.nickname ?? "");
             setField(data.session.gameState.field);
+            setTurn(data.session.gameState.turn);
           }
           break;
         case "chat_message":
           if (data.chat) setRoomChat(data.chat);
           break;
         case "game_state":
-          if (data.gameState) updateField(data.gameState.field);
+          if (data.gameState) {
+            updateField(data.gameState.field);
+            setTurn(data.gameState.turn);
+          }
           break;
         case "end_game":
           if (data.winner === "creator" && creator) {
@@ -134,6 +139,7 @@ const App: FC = () => {
           sendCoordinates={sendCoordinates}
           userId={userId}
           creator={creator}
+          turn={turn}
         />
       ) : (
         <Lobby

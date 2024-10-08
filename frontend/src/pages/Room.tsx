@@ -11,6 +11,7 @@ import preloader from "../assets/img/ghost.gif";
 import style from "./Room.module.scss";
 
 interface RoomProps {
+  turn: "creator" | "guest" | undefined;
   nickname: string;
   roomChat: RoomChat[];
   roomCreator: string;
@@ -23,6 +24,7 @@ interface RoomProps {
 }
 
 const Room: FC<RoomProps> = ({
+  turn,
   nickname,
   roomChat,
   roomCreator,
@@ -118,6 +120,7 @@ const Room: FC<RoomProps> = ({
                 sendCoordinates={sendCoordinates}
                 userId={userId}
                 creator={creator}
+                turn={turn}
               />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
@@ -164,6 +167,7 @@ const Room: FC<RoomProps> = ({
                 sendCoordinates={sendCoordinates}
                 userId={userId}
                 creator={creator}
+                turn={turn}
               />
             </>
           )}

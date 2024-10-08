@@ -14,13 +14,15 @@ export type RoomI = {
   playersInRoom: { nickname: string; userId: number; pieceType: string }[];
 };
 
+interface GameState {
+  turn: "creator" | "guest";
+  field: FigureKind[][];
+}
+
 export type Session = {
   roomId: number;
   created: string;
-  gameState: {
-    turn: "creator" | "guest";
-    field: FigureKind[][];
-  };
+  gameState: GameState;
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
     guest?: { ws: WebSocket; userId: number; nickname: string; pieceType: string };
@@ -38,7 +40,7 @@ export type Data = {
   creator?: boolean;
   inGame?: boolean;
   pieceType?: string;
-  gameState?: { field: FigureKind[][] };
+  gameState?: GameState;
   session?: Session;
   rooms?: RoomI[];
   winner?: "creator" | "guest";

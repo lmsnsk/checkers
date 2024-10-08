@@ -10,23 +10,18 @@ export const sendStartGameState = (ws: WebSocket, sessions: Session[], data: Joi
       ws.send(
         JSON.stringify({
           action: "game_state",
-          gameState: { field: reverseField(session.gameState.field) },
-        })
-      );
-      session.players.creator.ws.send(
-        JSON.stringify({
-          action: "game_state",
+          gameState: { field: reverseField(session.gameState.field), turn: session.gameState.turn },
         })
       );
     }
   });
 };
 
-const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState, isCreator: boolean) => {
+const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState) => {
   ws.send(
     JSON.stringify({
       action: "game_state",
-      gameState: { field: isCreator ? gameState.field : gameState.field },
+      gameState: { field: gameState.field, turn: gameState.turn },
     })
   );
 };
@@ -38,13 +33,19 @@ const sendGameStateToBothPlayer = (session: Session, turn: "creator" | "guest") 
   session.players.creator.ws.send(
     JSON.stringify({
       action: "game_state",
-      gameState: { field: turn === "creator" ? field : reversedField },
+      gameState: {
+        field: turn === "creator" ? field : reversedField,
+        turn: turn === "creator" ? "guest" : "creator",
+      },
     })
   );
   session.players.guest?.ws.send(
     JSON.stringify({
       action: "game_state",
-      gameState: { field: turn === "guest" ? field : reversedField },
+      gameState: {
+        field: turn === "guest" ? field : reversedField,
+        turn: turn === "creator" ? "guest" : "creator",
+      },
     })
   );
 };
@@ -83,7 +84,7 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
         return;
       }
       if (fieldClick(data.coordinates, gameState, isCreator)) {
-        sendGameStateToCurrentPlayer(ws, gameState, isCreator);
+        sendGameStateToCurrentPlayer(ws, gameState);
         gameState.firstClickCoords = data.coordinates;
       }
       if (gameState.winner) endGame(session);

@@ -1,9 +1,10 @@
 import { useSound } from "../lib/hooks";
-import { FC, Fragment, MouseEvent, useState } from "react";
+import { FC, MouseEvent } from "react";
 import Figures from "./Figures";
 
 import style from "./Field.module.scss";
 import Preloader from "./Preloader";
+import { FigureKind } from "../lib/types";
 
 /*
 0 - пустая
@@ -19,24 +20,19 @@ const marginColumn = ["8", "7", "6", "5", "4", "3", "2", "1"];
 const BL_CELL = "#769656";
 const WH_CELL = "#ffcb87";
 
-interface CheckerType {
-  x: number;
-  y: number;
-  color: 1 | 2 | 9;
-  isQueen: boolean;
-}
-
 interface FieldProps {
+  turn: "creator" | "guest" | undefined;
   fieldSize: number;
   roomCreator: string;
   roomGuest: string;
-  field: number[][];
+  field: FigureKind[][];
   userId: number | undefined;
   creator: boolean;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
 const Field: FC<FieldProps> = ({
+  turn,
   fieldSize,
   roomCreator,
   roomGuest,
@@ -45,10 +41,6 @@ const Field: FC<FieldProps> = ({
   creator,
   sendCoordinates,
 }) => {
-  const [repeatMove, setRepeatMove] = useState(false);
-  const [playerColor, setPlayerColor] = useState<1 | 2>(2);
-  const [currentChecker, setCurrentChecker] = useState<CheckerType | null>(null);
-
   // const playSound = useSound("../assets/sounds/checker.mp3");
 
   const onClickHandler = (e: MouseEvent) => {
@@ -105,6 +97,10 @@ const Field: FC<FieldProps> = ({
   return (
     <>
       <div className={style.main}>
+        <span className={style.enemyName}>{creator ? roomGuest : roomCreator}</span>
+        {((turn === "creator" && !creator) || (turn === "guest" && creator)) &&
+          roomGuest &&
+          roomCreator && <span className={style.enemyTurn}>Ход противника</span>}
         {drawMarginRow("top")}
         <div className={style.wrapper}>
           {drawMarginColumn("left")}
@@ -120,6 +116,10 @@ const Field: FC<FieldProps> = ({
         </div>
         {drawMarginRow("bottom")}
         {(!roomCreator || !roomGuest) && <Preloader />}
+        <span className={style.playerName}>{creator ? roomCreator : roomGuest}</span>
+        {((turn === "creator" && creator) || (turn === "guest" && !creator)) &&
+          roomGuest &&
+          roomCreator && <span className={style.youTurn}>Ваш ход</span>}
       </div>
     </>
   );
