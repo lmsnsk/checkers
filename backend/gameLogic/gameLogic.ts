@@ -15,29 +15,58 @@ export const resetCanMove = (checkers: Checker[]): void => {
   }
 };
 
-const checkFreeMove = (field: FigKind[][], x: number, y: number): boolean => {
-  if (y === 0) return false;
+export const resetChosen = (checkers: Checker[]): void => {
+  for (let checker of checkers) {
+    if (checker.isChosen) checker.isChosen = false;
+  }
+};
+
+const checkFreeMove = (
+  possibleTurns: PossibleTurns[],
+  field: FigKind[][],
+  checker: Checker,
+  color: "white" | "black"
+): boolean => {
+  if (checker.y === 0) return false;
 
   let isPossibleTurn = false;
-  if (x > 0 && !field[y - 1][x - 1]) isPossibleTurn = true;
-  if (x < 7 && !field[y - 1][x + 1]) isPossibleTurn = true;
+  const { x, y, id: checkerId } = checker;
+
+  if (x > 0 && !field[y - 1][x - 1]) {
+    possibleTurns.push({ x: x - 1, y: y - 1, checkerId, color, isKing: false });
+    isPossibleTurn = true;
+  }
+  if (x < 7 && !field[y - 1][x + 1]) {
+    possibleTurns.push({ x: x + 1, y: y - 1, checkerId, color, isKing: false });
+    isPossibleTurn = true;
+  }
 
   return isPossibleTurn;
 };
 
-const checkFreeKingMove = (field: FigKind[][], x: number, y: number): boolean => {
+const checkFreeKingMove = (
+  possibleTurns: PossibleTurns[],
+  field: FigKind[][],
+  checker: Checker,
+  color: "white" | "black"
+): boolean => {
   let isPossibleTurn = false;
+  const { x, y, id: checkerId } = checker;
 
   for (let i = 1; x - i >= 0 && y - i >= 0 && field[y - i][x - i] === 0; i++) {
+    possibleTurns.push({ x: x - i, y: y - i, checkerId, color, isKing: true });
     isPossibleTurn = true;
   }
   for (let i = 1; x + i <= 7 && y - i >= 0 && field[y - i][x + i] === 0; i++) {
+    possibleTurns.push({ x: x + i, y: y - i, checkerId, color, isKing: true });
     isPossibleTurn = true;
   }
   for (let i = 1; x - i >= 0 && y + i <= 7 && field[y + i][x - i] === 0; i++) {
+    possibleTurns.push({ x: x - i, y: y + i, checkerId, color, isKing: true });
     isPossibleTurn = true;
   }
   for (let i = 1; x + i <= 7 && y + i <= 7 && field[y + i][x + i] === 0; i++) {
+    possibleTurns.push({ x: x + i, y: y + i, checkerId, color, isKing: true });
     isPossibleTurn = true;
   }
 
@@ -49,7 +78,6 @@ const checkFightMove = (
   field: FigKind[][],
   checker: Checker,
   color: "white" | "black",
-  isKing: boolean,
   isCreator: boolean
 ): boolean => {
   const enemy = isCreator ? FigKind.BLACK : FigKind.WHITE;
@@ -57,22 +85,22 @@ const checkFightMove = (
   const { x, y, id: checkerId } = checker;
 
   if (field[y - 1][x - 1] === enemy && y - 2 >= 0 && field[y - 2][x - 2] === 0) {
-    possibleTurns.push({ x: x - 2, y: y - 2, checkerId, color, isKing });
+    possibleTurns.push({ x: x - 2, y: y - 2, checkerId, color, isKing: false });
     isFighting = true;
   }
 
   if (field[y - 1][x + 1] === enemy && y - 2 >= 0 && field[y - 2][x + 2] === 0) {
-    possibleTurns.push({ x: x + 2, y: y - 2, checkerId, color, isKing });
+    possibleTurns.push({ x: x + 2, y: y - 2, checkerId, color, isKing: false });
     isFighting = true;
   }
 
   if (((y < 6 && field[y + 1][x - 1] === enemy) || y < 6) && field[y + 2][x - 2] === 0) {
-    possibleTurns.push({ x: x - 2, y: y + 2, checkerId, color, isKing });
+    possibleTurns.push({ x: x - 2, y: y + 2, checkerId, color, isKing: false });
     isFighting = true;
   }
 
   if (((y < 6 && field[y + 1][x + 1] === enemy) || y < 6) && field[y + 2][x + 2] === 0) {
-    possibleTurns.push({ x: x + 2, y: y + 2, checkerId, color, isKing });
+    possibleTurns.push({ x: x + 2, y: y + 2, checkerId, color, isKing: false });
     isFighting = true;
   }
   return isFighting;
@@ -99,7 +127,7 @@ export const checkPossibleMoves = (
     if (checker.color !== color) continue;
 
     if (!checker.isKing) {
-      if (checkFightMove(gameState.possibleTurns, field, checker, color, false, isCreator)) {
+      if (checkFightMove(gameState.possibleTurns, field, checker, color, isCreator)) {
         checker.canMove = true;
         eatFlag = true;
       }
@@ -117,11 +145,11 @@ export const checkPossibleMoves = (
     if (checker.color !== color) continue;
 
     if (!checker.isKing) {
-      if (checkFreeMove(field, checker.x, checker.y)) {
+      if (checkFreeMove(gameState.possibleTurns, field, checker, color)) {
         checker.canMove = true;
       }
     } else {
-      if (checkFreeKingMove(field, checker.x, checker.y)) {
+      if (checkFreeKingMove(gameState.possibleTurns, field, checker, color)) {
         checker.canMove = true;
       }
     }
@@ -136,6 +164,33 @@ export const firstClickRealization = (coord: Coord, gameState: GameState) => {
         (turn) => turn.checkerId === checker.id
       );
       gameState.showPossibleTurns = true;
+      gameState.firstClickDone = true;
+      return true;
     }
   }
+  return false;
+};
+
+export const move = (coord: Coord, gameState: GameState) => {
+  let checkCorrectClock = false;
+
+  for (const turn of gameState.possibleTurns) {
+    if (turn.x === coord.x && turn.y === coord.y) {
+      checkCorrectClock = true;
+    }
+  }
+
+  if (!checkCorrectClock) return false;
+
+  for (const checker of gameState.checkers) {
+    if (checker.isChosen) {
+      checker.move(coord.x, coord.y);
+      gameState.showPossibleTurns = false;
+      gameState.possibleTurns = [];
+      gameState.firstClickDone = false;
+      gameState.turn = gameState.turn === "creator" ? "guest" : "creator";
+      return true;
+    }
+  }
+  return false;
 };
