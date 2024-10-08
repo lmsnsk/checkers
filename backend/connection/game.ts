@@ -1,6 +1,7 @@
 import { WebSocket } from "ws";
 
 import { CoordinatesData, Session, JoinRoomData, GameState, Checker } from "../lib/types";
+import { firstClickRealization } from "../gameLogic/gameLogic";
 
 export const reverseCoordinates = (checkers: Checker[]) => {
   for (const checker of checkers) {
@@ -8,14 +9,9 @@ export const reverseCoordinates = (checkers: Checker[]) => {
   }
 };
 
-// const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState) => {
-//   ws.send(
-//     JSON.stringify({
-//       action: "game_state",
-//       gameState: { field: gameState.field, turn: gameState.turn },
-//     })
-//   );
-// };
+const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState) => {
+  ws.send(JSON.stringify({ action: "game_state", gameState }));
+};
 
 // const sendGameStateToBothPlayer = (session: Session, turn: "creator" | "guest") => {
 //   const field = session.gameState.field;
@@ -59,8 +55,8 @@ const endGame = (session: Session) => {
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
   sessions.forEach((session) => {
     const gameState = session.gameState;
-    const creator = session.players.creator;
     const guest = session.players.guest;
+    const creator = session.players.creator;
     const isCreator = creator.userId === data.userId;
 
     if ((isCreator && gameState.turn === "guest") || (!isCreator && gameState.turn === "creator")) {
@@ -68,6 +64,11 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     }
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
+      if (!gameState.firstClickDone) {
+        firstClickRealization(data.coordinates, gameState);
+        sendGameStateToCurrentPlayer(ws, gameState);
+      }
+
       if (gameState.winner) endGame(session);
     }
   });

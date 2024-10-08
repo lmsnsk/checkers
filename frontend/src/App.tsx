@@ -26,9 +26,9 @@ const App: FC = () => {
   const [inGame, setInGame] = useState<boolean>(false);
   const [roomCreator, setRoomCreator] = useState<string>("");
   const [roomGuest, setRoomGuest] = useState<string>("");
-  const [checkers, setCheckers] = useState<Checker[]>([]);
+  // const [checkers, setCheckers] = useState<Checker[]>([]);
   const [gameState, setGameState] = useState<GameState>();
-  const [turn, setTurn] = useState<"creator" | "guest" | undefined>();
+  // const [turn, setTurn] = useState<"creator" | "guest" | undefined>();
 
   const socket: WebSocket | null = useSocket();
 
@@ -50,9 +50,9 @@ const App: FC = () => {
     }
   };
 
-  const updateField = (checkers: Checker[]) => {
-    setCheckers(checkers);
-  };
+  // const updateGameState = (checkers: Checker[]) => {
+  //   setCheckers(checkers);
+  // };
 
   const sendCoordinates = (x: number, y: number, userId: number | undefined) => {
     if (socket) {
@@ -99,8 +99,8 @@ const App: FC = () => {
           break;
         case "game_state":
           if (data.gameState) {
-            updateField(data.gameState.checkers);
-            setTurn(data.gameState.turn);
+            // updateGameState(data.gameState);
+            setGameState(data.gameState);
           }
           break;
         case "end_game":

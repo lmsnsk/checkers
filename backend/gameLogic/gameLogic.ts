@@ -1,4 +1,5 @@
-import { Checker, FigKind, GameState, PossibleTurns } from "../lib/types";
+import { coordinates } from "./../connection/game";
+import { Checker, Coord, FigKind, GameState, PossibleTurns } from "../lib/types";
 
 const createField = (checkers: Checker[]): FigKind[][] => {
   const arr: FigKind[][] = new Array(8).fill(0).map(() => new Array(8).fill(0));
@@ -123,6 +124,18 @@ export const checkPossibleMoves = (
       if (checkFreeKingMove(field, checker.x, checker.y)) {
         checker.canMove = true;
       }
+    }
+  }
+};
+
+export const firstClickRealization = (coord: Coord, gameState: GameState) => {
+  for (const checker of gameState.checkers) {
+    if (checker.x === coord.x && checker.y === coord.y) {
+      checker.isChosen = true;
+      gameState.possibleTurns = gameState.possibleTurns.filter(
+        (turn) => turn.checkerId === checker.id
+      );
+      gameState.showPossibleTurns = true;
     }
   }
 };

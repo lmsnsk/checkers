@@ -54,6 +54,7 @@ export const createRoom = (
     roomId: roomId,
     created: dateToString(),
     gameState: {
+      firstClickDone: false,
       winner: undefined,
       turn: "creator",
       checkers: startField(),

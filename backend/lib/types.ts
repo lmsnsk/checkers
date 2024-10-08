@@ -67,6 +67,7 @@ export interface Session {
   roomId: number;
   created: string;
   gameState: {
+    firstClickDone: boolean;
     winner: "creator" | "guest" | undefined;
     turn: "creator" | "guest";
     firstClickCoords?: Coord;
