@@ -4,15 +4,7 @@ import Figures from "./Figures";
 
 import style from "./Field.module.scss";
 import Preloader from "./Preloader";
-import { FigureKind } from "../lib/types";
-
-/*
-0 - пустая
-1 - белая
-2 - черная
-3 - белая королева
-4 - черная королева
-*/
+import { GameState } from "../lib/types";
 
 const marginRow = [" ", "A", "B", "C", "D", "E", "F", "G", "H", " "];
 const marginColumn = ["8", "7", "6", "5", "4", "3", "2", "1"];
@@ -21,24 +13,22 @@ const BL_CELL = "#769656";
 const WH_CELL = "#ffcb87";
 
 interface FieldProps {
-  turn: "creator" | "guest" | undefined;
   fieldSize: number;
   roomCreator: string;
   roomGuest: string;
-  field: FigureKind[][];
   userId: number | undefined;
   creator: boolean;
+  gameState: GameState | undefined;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
 const Field: FC<FieldProps> = ({
-  turn,
   fieldSize,
   roomCreator,
   roomGuest,
-  field,
   userId,
   creator,
+  gameState,
   sendCoordinates,
 }) => {
   // const playSound = useSound("../assets/sounds/checker.mp3");
@@ -52,12 +42,14 @@ const Field: FC<FieldProps> = ({
   };
 
   const drawField = () => {
-    return field.map((row, y) => {
-      return row.map((_, x) => {
-        const color = (x + y) % 2 ? BL_CELL : WH_CELL;
-        return <div key={`${x}${y}`} style={{ backgroundColor: color }}></div>;
+    return Array(8)
+      .fill(Array(8).fill(0))
+      .map((row: number[], y: number) => {
+        return row.map((_: number, x: number) => {
+          const color = (x + y) % 2 ? BL_CELL : WH_CELL;
+          return <div key={`${x}${y}`} style={{ backgroundColor: color }}></div>;
+        });
       });
-    });
   };
 
   const drawMarginRow = (keyAdd: string) => {
@@ -98,7 +90,8 @@ const Field: FC<FieldProps> = ({
     <>
       <div className={style.main}>
         <span className={style.enemyName}>{creator ? roomGuest : roomCreator}</span>
-        {((turn === "creator" && !creator) || (turn === "guest" && creator)) &&
+        {gameState &&
+          ((gameState.turn === "creator" && !creator) || (gameState.turn === "guest" && creator)) &&
           roomGuest &&
           roomCreator && <span className={style.enemyTurn}>Ход противника</span>}
         {drawMarginRow("top")}
@@ -110,14 +103,16 @@ const Field: FC<FieldProps> = ({
             onClick={onClickHandler}
           >
             {drawField()}
-            <Figures field={field} fieldSize={fieldSize} creator={creator} />
+            <Figures gameState={gameState} fieldSize={fieldSize} creator={creator} />
           </div>
           {drawMarginColumn("right")}
         </div>
         {drawMarginRow("bottom")}
         {(!roomCreator || !roomGuest) && <Preloader />}
         <span className={style.playerName}>{creator ? roomCreator : roomGuest}</span>
-        {((turn === "creator" && creator) || (turn === "guest" && !creator)) &&
+        {gameState &&
+          ((gameState!.turn === "creator" && creator) ||
+            (gameState!.turn === "guest" && !creator)) &&
           roomGuest &&
           roomCreator && <span className={style.youTurn}>Ваш ход</span>}
       </div>

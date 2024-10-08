@@ -14,9 +14,29 @@ export type RoomI = {
   playersInRoom: { nickname: string; userId: number; pieceType: string }[];
 };
 
-interface GameState {
+export type Checker = {
+  id: number;
+  x: number;
+  y: number;
+  color: "white" | "black";
+  isChosen: boolean;
+  isKing: boolean;
+  canMove: boolean;
+};
+
+export type PossibleTurns = {
+  x: number;
+  y: number;
+  checkerId: number;
+  color: "white" | "black";
+  isKing: boolean;
+};
+
+export interface GameState {
   turn: "creator" | "guest";
-  field: FigureKind[][];
+  checkers: Checker[];
+  possibleTurns: PossibleTurns[];
+  showPossibleTurns: boolean;
 }
 
 export type Session = {

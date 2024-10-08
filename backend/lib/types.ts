@@ -6,7 +6,7 @@ export enum ClickState {
   END,
 }
 
-export enum FigureKind {
+export enum FigKind {
   EMPTY,
   WHITE,
   BLACK,
@@ -28,9 +28,39 @@ export interface User {
   nickname?: string;
 }
 
-export interface eatVariants {
-  checkerForEat: Coord;
-  possibleTurns: Coord[];
+export interface PossibleTurns {
+  x: number;
+  y: number;
+  checkerId: number;
+  color: "white" | "black";
+  isKing: boolean;
+}
+
+export class Checker {
+  constructor(
+    public id: number,
+    public x: number,
+    public y: number,
+    public color: "white" | "black"
+  ) {}
+
+  isChosen = false;
+  canMove = false;
+  isKing = false;
+
+  move(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
+  becomeKing() {
+    this.isKing = true;
+  }
+
+  reverseCoordinates() {
+    this.x = 7 - this.x;
+    this.y = 7 - this.y;
+  }
 }
 
 export interface Session {
@@ -38,12 +68,11 @@ export interface Session {
   created: string;
   gameState: {
     winner: "creator" | "guest" | undefined;
-    whiteEated: number;
-    blackEated: number;
-    eatVariants: eatVariants[];
     turn: "creator" | "guest";
     firstClickCoords?: Coord;
-    field: FigureKind[][];
+    checkers: Checker[];
+    possibleTurns: PossibleTurns[];
+    showPossibleTurns: boolean;
   };
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };

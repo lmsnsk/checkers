@@ -1,6 +1,6 @@
 import { FC } from "react";
 
-import { FigureKind } from "../lib/types";
+import { GameState } from "../lib/types";
 import whiteCrownSvg from "../assets/img/whiteCrown.svg";
 import blackCrownSvg from "../assets/img/blackCrown.svg";
 
@@ -13,55 +13,64 @@ const WH_OUT = "white";
 
 interface FiguresProps {
   fieldSize: number;
-  field: FigureKind[][];
   creator: boolean;
+  gameState: GameState | undefined;
 }
 
-const Figures: FC<FiguresProps> = ({ fieldSize, field, creator }) => {
+const Figures: FC<FiguresProps> = ({ fieldSize, gameState, creator }) => {
   const cellSize = fieldSize / 8;
   const checkerSize = cellSize * 0.8;
 
+  function showFigures(figures: GameState["checkers"] | GameState["possibleTurns"]) {
+    return figures.map((figure) => {
+      const outerColor = figure.color === "black" ? BL_OUT : WH_OUT;
+      const innerColor = figure.color === "black" ? BL_IN : WH_IN;
+
+      let className;
+      let isOpacity = false;
+
+      if ("canMove" in figure && "isChosen" in figure) {
+        className = `${style.checker} ${figure.canMove ? style.canMove : ""} ${
+          figure.isChosen ? style.chosen : ""
+        }`;
+      } else {
+        className = style.checker;
+        isOpacity = true;
+      }
+
+      return (
+        <div
+          key={`checker-${figure.x}${figure.y}`}
+          className={className}
+          style={{
+            opacity: isOpacity ? 0.2 : 1,
+            border: `${checkerSize * 0.15}px solid ${outerColor}`,
+            backgroundColor: innerColor,
+            left: cellSize * figure.x + cellSize / 2 - checkerSize / 2,
+            top: cellSize * figure.y + cellSize / 2 - checkerSize / 2,
+            width: checkerSize,
+            height: checkerSize,
+          }}
+        >
+          {figure.isKing && (
+            <>
+              {figure.color === "white" && <img src={whiteCrownSvg} alt="crown" />}
+              {figure.color === "black" && <img src={blackCrownSvg} alt="crown" />}
+            </>
+          )}
+        </div>
+      );
+    });
+  }
+
+  if (!gameState || !gameState.checkers || !gameState.checkers.length) {
+    return <></>; /////
+  }
+
   return (
     <div className={style.main}>
-      {field.map((row, y) => {
-        return row.map((cell, x) => {
-          if (cell === FigureKind.EMPTY) {
-            return null;
-          }
-          const outerColor =
-            cell === FigureKind.BLACK ||
-            cell === FigureKind.BLACK_KING ||
-            (cell === FigureKind.POSSIBLE_TURN && !creator)
-              ? BL_OUT
-              : WH_OUT;
-
-          const innerColor =
-            cell === FigureKind.BLACK ||
-            cell === FigureKind.BLACK_KING ||
-            (cell === FigureKind.POSSIBLE_TURN && !creator)
-              ? BL_IN
-              : WH_IN;
-
-          return (
-            <div
-              key={`checkers-${x}${y}`}
-              className={style.checker}
-              style={{
-                opacity: cell === FigureKind.POSSIBLE_TURN ? 0.2 : 1,
-                border: `${checkerSize * 0.15}px solid ${outerColor}`,
-                backgroundColor: innerColor,
-                left: cellSize * x + cellSize / 2 - checkerSize / 2,
-                top: cellSize * y + cellSize / 2 - checkerSize / 2,
-                width: checkerSize,
-                height: checkerSize,
-              }}
-            >
-              {cell === FigureKind.WHITE_KING && <img src={whiteCrownSvg} alt="crown" />}
-              {cell === FigureKind.BLACK_KING && <img src={blackCrownSvg} alt="crown" />}
-            </div>
-          );
-        });
-      })}
+      {showFigures(gameState.checkers)}
+      {gameState.showPossibleTurns && <>{showFigures(gameState.possibleTurns)}</>}
     </div>
   );
 };

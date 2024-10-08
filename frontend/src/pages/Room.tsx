@@ -9,14 +9,14 @@ import { RoomChat } from "../App";
 import preloader from "../assets/img/ghost.gif";
 
 import style from "./Room.module.scss";
+import { GameState } from "../lib/types";
 
 interface RoomProps {
-  turn: "creator" | "guest" | undefined;
   nickname: string;
   roomChat: RoomChat[];
   roomCreator: string;
   roomGuest: string;
-  field: number[][];
+  gameState: GameState | undefined;
   userId: number | undefined;
   creator: boolean;
   sendChatMessage: (text: string) => void;
@@ -24,14 +24,13 @@ interface RoomProps {
 }
 
 const Room: FC<RoomProps> = ({
-  turn,
   nickname,
   roomChat,
   roomCreator,
   roomGuest,
-  field,
   userId,
   creator,
+  gameState,
   sendChatMessage,
   sendCoordinates,
 }) => {
@@ -116,11 +115,10 @@ const Room: FC<RoomProps> = ({
                 fieldSize={fieldSize}
                 roomCreator={roomCreator}
                 roomGuest={roomGuest}
-                field={field}
                 sendCoordinates={sendCoordinates}
                 userId={userId}
                 creator={creator}
-                turn={turn}
+                gameState={gameState}
               />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
@@ -163,11 +161,10 @@ const Room: FC<RoomProps> = ({
                 fieldSize={fieldSize}
                 roomCreator={roomCreator}
                 roomGuest={roomGuest}
-                field={field}
                 sendCoordinates={sendCoordinates}
                 userId={userId}
                 creator={creator}
-                turn={turn}
+                gameState={gameState}
               />
             </>
           )}

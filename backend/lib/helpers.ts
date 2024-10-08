@@ -1,4 +1,4 @@
-import { FigureKind } from "./types";
+import { FigKind } from "./types";
 
 let userCounter = 0;
 
@@ -17,10 +17,6 @@ export const reverseField = (field: number[][]): number[][] => {
   return field.map((row) => [...row].reverse()).reverse();
 };
 
-export const reverseCoordinates = (coordinates: { x: number; y: number }) => {
-  return { x: 7 - coordinates.x, y: 7 - coordinates.y };
-};
-
 // export const startField: FigureKind[][] = [
 //   [0, 0, 0, 0, 0, 0, 0, 0],
 //   [0, 0, 0, 0, 0, 0, 0, 0],
@@ -32,12 +28,12 @@ export const reverseCoordinates = (coordinates: { x: number; y: number }) => {
 //   [0, 0, 0, 0, 0, 0, 0, 0],
 // ];
 
-export const startField: FigureKind[][] = [
+export const initialField: FigKind[][] = [
   [0, 2, 0, 2, 0, 2, 0, 2],
   [2, 0, 2, 0, 2, 0, 2, 0],
   [0, 2, 0, 2, 0, 2, 0, 2],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0, 0],
   [1, 0, 1, 0, 1, 0, 1, 0],
   [0, 1, 0, 1, 0, 1, 0, 1],
   [1, 0, 1, 0, 1, 0, 1, 0],

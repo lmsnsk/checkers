@@ -13,10 +13,19 @@
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
 
     img {
       user-select: none;
       width: 75%;
     }
+  }
+
+  .chosen {
+    box-shadow: 0 0 30px 0 rgb(11, 7, 255);
+  }
+
+  .canMove {
+    box-shadow: 0 0 30px 0 rgb(255, 18, 18);
   }
 }

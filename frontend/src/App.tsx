@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react";
 
 import Lobby from "./pages/Lobby";
 import { useSocket } from "./lib/hooks";
-import { Data, RoomI } from "./lib/types";
+import { Checker, Data, GameState, PossibleTurns, RoomI } from "./lib/types";
 import Room from "./pages/Room";
 
 interface RoomListItem {
@@ -26,7 +26,8 @@ const App: FC = () => {
   const [inGame, setInGame] = useState<boolean>(false);
   const [roomCreator, setRoomCreator] = useState<string>("");
   const [roomGuest, setRoomGuest] = useState<string>("");
-  const [field, setField] = useState<number[][]>(Array(8).fill(Array(8).fill(0)));
+  const [checkers, setCheckers] = useState<Checker[]>([]);
+  const [gameState, setGameState] = useState<GameState>();
   const [turn, setTurn] = useState<"creator" | "guest" | undefined>();
 
   const socket: WebSocket | null = useSocket();
@@ -49,8 +50,8 @@ const App: FC = () => {
     }
   };
 
-  const updateField = (field: number[][]) => {
-    setField(field);
+  const updateField = (checkers: Checker[]) => {
+    setCheckers(checkers);
   };
 
   const sendCoordinates = (x: number, y: number, userId: number | undefined) => {
@@ -90,8 +91,7 @@ const App: FC = () => {
           if (data.session) {
             setRoomCreator(data.session.players.creator.nickname);
             setRoomGuest(data.session.players.guest?.nickname ?? "");
-            setField(data.session.gameState.field);
-            setTurn(data.session.gameState.turn);
+            setGameState(data.session.gameState);
           }
           break;
         case "chat_message":
@@ -99,7 +99,7 @@ const App: FC = () => {
           break;
         case "game_state":
           if (data.gameState) {
-            updateField(data.gameState.field);
+            updateField(data.gameState.checkers);
             setTurn(data.gameState.turn);
           }
           break;
@@ -135,11 +135,10 @@ const App: FC = () => {
           sendChatMessage={sendChatMessage}
           roomCreator={roomCreator}
           roomGuest={roomGuest}
-          field={field}
           sendCoordinates={sendCoordinates}
           userId={userId}
           creator={creator}
-          turn={turn}
+          gameState={gameState}
         />
       ) : (
         <Lobby
