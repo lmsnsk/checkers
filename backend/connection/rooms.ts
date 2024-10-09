@@ -54,9 +54,11 @@ export const createRoom = (
     roomId: roomId,
     created: dateToString(),
     gameState: {
+      kingEatDirection: undefined,
       enemiesForEat: [],
       needToEat: false,
       firstClickDone: false,
+      checkerAdditionalMove: undefined,
       winner: undefined,
       turn: "creator",
       checkers: startField(),

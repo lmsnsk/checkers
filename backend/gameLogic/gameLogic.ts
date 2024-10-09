@@ -1,7 +1,7 @@
 import { coordinates } from "./../connection/game";
 import { Checker, Coord, FigKind, GameState, PossibleTurns } from "../lib/types";
 
-const createField = (checkers: Checker[]): FigKind[][] => {
+export const createField = (checkers: Checker[]): FigKind[][] => {
   const arr: FigKind[][] = new Array(8).fill(0).map(() => new Array(8).fill(0));
   for (let checker of checkers) {
     arr[checker.y][checker.x] = checker.color === "white" ? FigKind.WHITE : FigKind.BLACK;
@@ -73,7 +73,7 @@ const checkFreeKingMove = (
   return isPossibleTurn;
 };
 
-const checkFightMove = (
+export const checkFightMove = (
   gameState: GameState,
   field: FigKind[][],
   checker: Checker,
@@ -111,9 +111,7 @@ const checkFightMove = (
   return isFighting;
 };
 
-//////////////////----------------WORK IN PROGRESS-------------/////////////////////////
-
-const checkFightKingMove = (
+export const checkFightKingMove = (
   gameState: GameState,
   field: FigKind[][],
   checker: Checker,
@@ -126,19 +124,27 @@ const checkFightKingMove = (
   let isFighting = false;
   const { x, y, id: checkerId } = checker;
 
-  // let firstCheck = true;
-
-  const oneDirectionChecker = (dir: "lt" | "rt" | "lb" | "rb") => {
+  const oneDirectionChecker = (direction: "lt" | "rt" | "lb" | "rb") => {
     let firstCheck = true;
+    const ked = gameState.kingEatDirection;
+
+    if (
+      (ked === "lb" && direction === "rt") ||
+      (ked === "lt" && direction === "rb") ||
+      (ked === "rb" && direction === "lt") ||
+      (ked === "rt" && direction === "lb")
+    ) {
+      return;
+    }
 
     for (
       let i = 1;
-      (dir === "lt" || dir === "rt" ? y - i >= 0 : y + i <= 7) &&
-      (dir === "lt" || dir === "lb" ? x - i >= 0 : x + i <= 7);
+      (direction === "lt" || direction === "rt" ? y - i >= 0 : y + i <= 7) &&
+      (direction === "lt" || direction === "lb" ? x - i >= 0 : x + i <= 7);
       i++
     ) {
-      const xx = dir === "lt" || dir === "lb" ? x - i : x + i;
-      const yy = dir === "lt" || dir === "rt" ? y - i : y + i;
+      const xx = direction === "lt" || direction === "lb" ? x - i : x + i;
+      const yy = direction === "lt" || direction === "rt" ? y - i : y + i;
 
       if (field[yy][xx] === player || (!firstCheck && field[yy][xx] === enemy)) break;
 
@@ -153,13 +159,13 @@ const checkFightKingMove = (
       }
 
       if (
-        (dir === "lt" || dir === "rt" ? y - i > 0 : y + i <= 6) &&
-        (dir === "lt" || dir === "lb" ? x - i > 0 : x + i <= 6) &&
+        (direction === "lt" || direction === "rt" ? y - i > 0 : y + i <= 6) &&
+        (direction === "lt" || direction === "lb" ? x - i > 0 : x + i <= 6) &&
         field[yy][xx] === enemy
       ) {
         if (
-          field[dir === "lt" || dir === "rt" ? y - i - 1 : y + i + 1][
-            dir === "lt" || dir === "lb" ? x - i - 1 : x + i + 1
+          field[direction === "lt" || direction === "rt" ? y - i - 1 : y + i + 1][
+            direction === "lt" || direction === "lb" ? x - i - 1 : x + i + 1
           ] === FigKind.EMPTY
         ) {
           gameState.enemiesForEat.push({ x: xx, y: yy });
@@ -177,116 +183,18 @@ const checkFightKingMove = (
   oneDirectionChecker("lb");
   oneDirectionChecker("rb");
 
-  // for (let i = 1; y - i >= 0 && x - i >= 0; i++) {
-  //   if (field[y - i][x - i] === player || (!firstCheck && field[y - i][x - i] === enemy)) break;
-
-  //   if (!firstCheck) {
-  //     gameState.possibleTurns.push({
-  //       x: x - i,
-  //       y: y - i,
-  //       checkerId,
-  //       color,
-  //       isKing: true,
-  //     });
-  //   }
-
-  //   if (y - i > 0 && x - i > 0 && field[y - i][x - i] === enemy) {
-  //     if (field[y - i - 1][x - i - 1] === FigKind.EMPTY) {
-  //       gameState.enemiesForEat.push({ x: x - i, y: y - i });
-  //       firstCheck = false;
-  //       isFighting = true;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // firstCheck = true;
-  // for (let i = 1; y - i >= 0 && x + i <= 7; i++) {
-  //   if (field[y - i][x + i] === player || (!firstCheck && field[y - i][x + i] === enemy)) break;
-
-  //   if (!firstCheck) {
-  //     gameState.possibleTurns.push({
-  //       x: x + i,
-  //       y: y - i,
-  //       checkerId,
-  //       color,
-  //       isKing: true,
-  //     });
-  //   }
-
-  //   if (y - i > 0 && x + i <= 6 && field[y - i][x + i] === enemy) {
-  //     if (field[y - i - 1][x + i + 1] === FigKind.EMPTY) {
-  //       gameState.enemiesForEat.push({ x: x + i, y: y - i });
-  //       firstCheck = false;
-  //       isFighting = true;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // firstCheck = true;
-  // for (let i = 1; y + i <= 7 && x - i >= 0; i++) {
-  //   if (field[y + i][x - i] === player || (!firstCheck && field[y + i][x - i] === enemy)) break;
-
-  //   if (!firstCheck) {
-  //     gameState.possibleTurns.push({
-  //       x: x - i,
-  //       y: y + i,
-  //       checkerId,
-  //       color,
-  //       isKing: true,
-  //     });
-  //   }
-
-  //   if (y + i > 0 && x + i <= 6 && field[y + i][x - i] === enemy) {
-  //     if (field[y + i + 1][x - i - 1] === FigKind.EMPTY) {
-  //       gameState.enemiesForEat.push({ x: x - i, y: y + i });
-  //       firstCheck = false;
-  //       isFighting = true;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // firstCheck = true;
-  // for (let i = 1; y + i <= 7 && x + i <= 7; i++) {
-  //   if (field[y + i][x + i] === player || (!firstCheck && field[y + i][x + i] === enemy)) break;
-
-  //   if (!firstCheck) {
-  //     gameState.possibleTurns.push({
-  //       x: x + i,
-  //       y: y + i,
-  //       checkerId,
-  //       color,
-  //       isKing: true,
-  //     });
-  //   }
-
-  //   if (y + i <= 6 && x + i <= 6 && field[y + i][x + i] === enemy) {
-  //     if (field[y + i + 1][x + i + 1] === FigKind.EMPTY) {
-  //       gameState.enemiesForEat.push({ x: x + i, y: y + i });
-  //       firstCheck = false;
-  //       isFighting = true;
-  //     } else {
-  //       break;
-  //     }
-  //   }
-  // }
-
   return isFighting;
 };
-//////////////////----------------WORK IN PROGRESS-------------/////////////////////////
 
 const eatChecker = (gameState: GameState, checker: Checker, coord: Coord) => {
-  let direction: string;
+  let direction: "lt" | "rt" | "lb" | "rb";
 
   if (coord.x > checker.x && coord.y > checker.y) direction = "rb";
   else if (coord.x < checker.x && coord.y < checker.y) direction = "lt";
   else if (coord.x > checker.x && coord.y < checker.y) direction = "rt";
   else direction = "lb";
+
+  gameState.kingEatDirection = direction;
 
   for (const enemy of gameState.enemiesForEat) {
     if (
@@ -365,7 +273,6 @@ export const firstClickRealization = (coord: Coord, gameState: GameState) => {
       checker.isChosen = true;
       resetCanMove(gameState.checkers);
 
-      // gameState.firstClickCoords = { x: coord.x, y: coord.y };
       gameState.showPossibleTurns = true;
       gameState.firstClickDone = true;
       return true;
@@ -387,17 +294,16 @@ export const move = (coord: Coord, gameState: GameState) => {
 
   for (const checker of gameState.checkers) {
     if (checker.isChosen) {
-      if (gameState.needToEat) eatChecker(gameState, checker, coord);
+      if (gameState.needToEat) {
+        eatChecker(gameState, checker, coord);
+        gameState.checkerAdditionalMove = checker;
+      }
 
       checker.move(coord.x, coord.y);
       checkKing(checker);
 
-      gameState.showPossibleTurns = false;
       gameState.possibleTurns = [];
       gameState.enemiesForEat = [];
-      gameState.firstClickDone = false;
-      gameState.needToEat = false;
-      gameState.turn = gameState.turn === "creator" ? "guest" : "creator";
 
       return true;
     }

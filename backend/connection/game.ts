@@ -2,8 +2,11 @@ import { WebSocket } from "ws";
 
 import { CoordinatesData, Session, JoinRoomData, GameState, Checker } from "../lib/types";
 import {
+  checkFightKingMove,
+  checkFightMove,
   checkPossibleMoves,
   checkWinner,
+  createField,
   firstClickRealization,
   move,
   resetChosen,
@@ -15,28 +18,8 @@ export const reverseCoordinates = (checkers: Checker[]) => {
   }
 };
 
-const sendGameStateToCurrentPlayer = (ws: WebSocket, gameState: GameState) => {
+const sendGameState = (ws: WebSocket, gameState: GameState) => {
   ws.send(JSON.stringify({ action: "game_state", gameState }));
-};
-
-const sendGameStateToBothPlayer = (session: Session) => {
-  session.players.creator.ws.send(
-    JSON.stringify({
-      action: "game_state",
-      gameState: {
-        ...session.gameState,
-      },
-    })
-  );
-  reverseCoordinates(session.gameState.checkers);
-  session.players.guest?.ws.send(
-    JSON.stringify({
-      action: "game_state",
-      gameState: {
-        ...session.gameState,
-      },
-    })
-  );
 };
 
 const endGame = (session: Session) => {
@@ -56,12 +39,12 @@ const endGame = (session: Session) => {
 
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
   sessions.forEach((session) => {
+    if (!session.players.guest) return;
+
     const gameState = session.gameState;
     const guest = session.players.guest;
     const creator = session.players.creator;
     const isCreator = creator.userId === data.userId;
-
-    if (!guest) return;
 
     if ((isCreator && gameState.turn === "guest") || (!isCreator && gameState.turn === "creator")) {
       return;
@@ -70,20 +53,41 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
       if (!gameState.firstClickDone) {
         if (firstClickRealization(data.coordinates, gameState)) {
-          sendGameStateToCurrentPlayer(ws, gameState);
+          sendGameState(ws, gameState);
         }
       } else {
         if (move(data.coordinates, gameState)) {
           const oppositeWs = isCreator ? guest.ws : creator.ws;
+          const checker = gameState.checkerAdditionalMove;
+          let additionalMove = false;
 
-          resetChosen(session.gameState.checkers);
-          sendGameStateToCurrentPlayer(ws, gameState);
+          if (checker) {
+            const field = createField(gameState.checkers);
+            const color = isCreator ? "white" : "black";
 
+            additionalMove = checker.isKing
+              ? checkFightKingMove(gameState, field, checker, color, isCreator)
+              : checkFightMove(gameState, field, checker, color, isCreator);
+          }
+
+          if (!additionalMove) {
+            gameState.turn = gameState.turn === "creator" ? "guest" : "creator";
+            gameState.showPossibleTurns = false;
+            gameState.firstClickDone = false;
+            gameState.needToEat = false;
+            resetChosen(session.gameState.checkers);
+          }
+          sendGameState(ws, gameState);
           reverseCoordinates(session.gameState.checkers);
-          checkPossibleMoves(gameState, !isCreator ? "white" : "black", !isCreator);
 
-          sendGameStateToCurrentPlayer(oppositeWs, gameState);
+          if (!additionalMove) {
+            checkPossibleMoves(gameState, isCreator ? "black" : "white", !isCreator);
+          }
+          sendGameState(oppositeWs, gameState);
 
+          if (additionalMove) {
+            reverseCoordinates(session.gameState.checkers);
+          }
           checkWinner(gameState);
         }
       }

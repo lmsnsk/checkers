@@ -67,6 +67,8 @@ export interface Session {
   roomId: number;
   created: string;
   gameState: {
+    kingEatDirection: "lt" | "rt" | "lb" | "rb" | undefined;
+    checkerAdditionalMove: Checker | undefined;
     needToEat: boolean;
     firstClickDone: boolean;
     winner: "creator" | "guest" | undefined;
