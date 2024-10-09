@@ -46,7 +46,7 @@ export class Checker {
 
   isChosen = false;
   canMove = false;
-  isKing = false;
+  isKing = true;
 
   move(x: number, y: number) {
     this.x = x;
@@ -67,12 +67,14 @@ export interface Session {
   roomId: number;
   created: string;
   gameState: {
+    needToEat: boolean;
     firstClickDone: boolean;
     winner: "creator" | "guest" | undefined;
     turn: "creator" | "guest";
     firstClickCoords?: Coord;
     checkers: Checker[];
     possibleTurns: PossibleTurns[];
+    enemiesForEat: Coord[];
     showPossibleTurns: boolean;
   };
   players: {

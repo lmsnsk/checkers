@@ -1,7 +1,13 @@
 import { WebSocket } from "ws";
 
 import { CoordinatesData, Session, JoinRoomData, GameState, Checker } from "../lib/types";
-import { firstClickRealization, move, resetChosen } from "../gameLogic/gameLogic";
+import {
+  checkPossibleMoves,
+  checkWinner,
+  firstClickRealization,
+  move,
+  resetChosen,
+} from "../gameLogic/gameLogic";
 
 export const reverseCoordinates = (checkers: Checker[]) => {
   for (const checker of checkers) {
@@ -22,6 +28,7 @@ const sendGameStateToBothPlayer = (session: Session) => {
       },
     })
   );
+  reverseCoordinates(session.gameState.checkers);
   session.players.guest?.ws.send(
     JSON.stringify({
       action: "game_state",
@@ -39,7 +46,6 @@ const endGame = (session: Session) => {
       winner: session.gameState.winner,
     })
   );
-  reverseCoordinates(session.gameState.checkers);
   session.players.guest?.ws.send(
     JSON.stringify({
       action: "end_game",
@@ -55,6 +61,8 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     const creator = session.players.creator;
     const isCreator = creator.userId === data.userId;
 
+    if (!guest) return;
+
     if ((isCreator && gameState.turn === "guest") || (!isCreator && gameState.turn === "creator")) {
       return;
     }
@@ -66,8 +74,17 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
         }
       } else {
         if (move(data.coordinates, gameState)) {
+          const oppositeWs = isCreator ? guest.ws : creator.ws;
+
           resetChosen(session.gameState.checkers);
-          sendGameStateToBothPlayer(session);
+          sendGameStateToCurrentPlayer(ws, gameState);
+
+          reverseCoordinates(session.gameState.checkers);
+          checkPossibleMoves(gameState, !isCreator ? "white" : "black", !isCreator);
+
+          sendGameStateToCurrentPlayer(oppositeWs, gameState);
+
+          checkWinner(gameState);
         }
       }
 
