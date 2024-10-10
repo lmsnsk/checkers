@@ -1,14 +1,11 @@
 import { FC } from "react";
 
 import style from "./MessagesList.module.scss";
-import { RoomChat } from "../App";
+import { useCheckerStore } from "../store/store";
 
-interface MessagesListProps {
-  nickname: string;
-  roomChat: RoomChat[];
-}
+const MessagesList: FC = () => {
+  const { roomChat, nickname } = useCheckerStore();
 
-const MessagesList: FC<MessagesListProps> = ({ nickname, roomChat }) => {
   return (
     <>
       {roomChat.map((message, index) => {

@@ -2,6 +2,8 @@ import { FC, Fragment, useState } from "react";
 import RoomsListItem from "./RoomsListItem";
 import LowerButtons from "./LowerButtons";
 
+import { useCheckerStore } from "../store/store";
+
 import style from "./RoomList.module.scss";
 
 export interface IListItem {
@@ -14,18 +16,11 @@ interface RoomsListProps {
   isMobile: boolean;
   createRoom: (nickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
-  roomList: IListItem[];
-  setCreator: (creator: boolean) => void;
 }
 
-const RoomsList: FC<RoomsListProps> = ({
-  isMobile,
-  roomList,
-  joinRoom,
-  createRoom,
-  setCreator,
-}) => {
+const RoomsList: FC<RoomsListProps> = ({ isMobile, joinRoom, createRoom }) => {
   const [chosenRoom, setChosenRoom] = useState(0);
+  const roomList = useCheckerStore((state) => state.roomList);
 
   return (
     <>
@@ -53,7 +48,6 @@ const RoomsList: FC<RoomsListProps> = ({
         </div>
       </div>
       <LowerButtons
-        setCreator={setCreator}
         chosenRoom={chosenRoom}
         isMobile={isMobile}
         createRoom={createRoom}

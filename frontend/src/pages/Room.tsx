@@ -4,40 +4,24 @@ import Chat from "../components/Chat";
 import Field from "../components/Field";
 import chatImg from "../assets/img/chat.png";
 import backImg from "../assets/img/back.png";
-import { RoomChat } from "../App";
+import { useCheckerStore } from "../store/store";
 
 import preloader from "../assets/img/ghost.gif";
 
 import style from "./Room.module.scss";
-import { GameState } from "../lib/types";
 
 interface RoomProps {
-  nickname: string;
-  roomChat: RoomChat[];
-  roomCreator: string;
-  roomGuest: string;
-  gameState: GameState | undefined;
-  userId: number | undefined;
-  creator: boolean;
   sendChatMessage: (text: string) => void;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
-const Room: FC<RoomProps> = ({
-  nickname,
-  roomChat,
-  roomCreator,
-  roomGuest,
-  userId,
-  creator,
-  gameState,
-  sendChatMessage,
-  sendCoordinates,
-}) => {
+const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates }) => {
   const [fieldSize, setFieldSize] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChatOpened, setIsChatOpened] = useState(false);
+
+  const { roomCreator, roomGuest } = useCheckerStore();
 
   useEffect(() => {
     const fieldSizeCalc = () => {
@@ -111,21 +95,9 @@ const Room: FC<RoomProps> = ({
                 {showPlayer(roomCreator, 1)}
                 {showPlayer(roomGuest, 2)}
               </div>
-              <Field
-                fieldSize={fieldSize}
-                roomCreator={roomCreator}
-                roomGuest={roomGuest}
-                sendCoordinates={sendCoordinates}
-                userId={userId}
-                creator={creator}
-                gameState={gameState}
-              />
+              <Field fieldSize={fieldSize} sendCoordinates={sendCoordinates} />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
-                  roomCreator={roomCreator}
-                  roomGuest={roomGuest}
-                  nickname={nickname}
-                  roomChat={roomChat}
                   fieldSize={fieldSize}
                   isVertical={isVertical}
                   sendChatMessage={sendChatMessage}
@@ -148,24 +120,12 @@ const Room: FC<RoomProps> = ({
                   {showPlayer(roomGuest, 2)}
                 </div>
                 <Chat
-                  roomCreator={roomCreator}
-                  roomGuest={roomGuest}
-                  nickname={nickname}
-                  roomChat={roomChat}
                   fieldSize={fieldSize}
                   isVertical={isVertical}
                   sendChatMessage={sendChatMessage}
                 />
               </div>
-              <Field
-                fieldSize={fieldSize}
-                roomCreator={roomCreator}
-                roomGuest={roomGuest}
-                sendCoordinates={sendCoordinates}
-                userId={userId}
-                creator={creator}
-                gameState={gameState}
-              />
+              <Field fieldSize={fieldSize} sendCoordinates={sendCoordinates} />
             </>
           )}
         </div>

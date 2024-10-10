@@ -14,6 +14,18 @@ export type RoomI = {
   playersInRoom: { nickname: string; userId: number; pieceType: string }[];
 };
 
+export interface RoomListItem {
+  roomId: number;
+  roomName: string;
+  playersInRoom: number;
+}
+
+export interface RoomChat {
+  text: string;
+  nickname: string;
+  date: string;
+}
+
 export type Checker = {
   id: number;
   x: number;

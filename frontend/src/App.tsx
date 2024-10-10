@@ -1,36 +1,29 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 
+import Room from "./pages/Room";
 import Lobby from "./pages/Lobby";
 import { useSocket } from "./lib/hooks";
-import { Checker, Data, GameState, PossibleTurns, RoomI } from "./lib/types";
-import Room from "./pages/Room";
-
-interface RoomListItem {
-  roomId: number;
-  roomName: string;
-  playersInRoom: number;
-}
-
-export interface RoomChat {
-  text: string;
-  nickname: string;
-  date: string;
-}
+import { Data, RoomI } from "./lib/types";
+import { useCheckerStore } from "./store/store";
 
 const App: FC = () => {
-  const [roomList, setRoomlist] = useState<RoomListItem[]>([]);
-  const [roomChat, setRoomChat] = useState<RoomChat[]>([]);
-  const [nickname, setNickname] = useState<string>("");
-  const [userId, setUserId] = useState<number | undefined>();
-  const [creator, setCreator] = useState<boolean>(false);
-  const [inGame, setInGame] = useState<boolean>(false);
-  const [roomCreator, setRoomCreator] = useState<string>("");
-  const [roomGuest, setRoomGuest] = useState<string>("");
-  // const [checkers, setCheckers] = useState<Checker[]>([]);
-  const [gameState, setGameState] = useState<GameState>();
-  // const [turn, setTurn] = useState<"creator" | "guest" | undefined>();
+  const { nickname, userId, creator, inGame } = useCheckerStore();
+  const { setUserId, setInGame, setRoomCreator, setRoomGuest } = useCheckerStore();
+  const { setGameState, setRoomList, setRoomChat, setNickname } = useCheckerStore();
 
   const socket: WebSocket | null = useSocket();
+
+  const roomListSetter = (data: Data) => {
+    if (data.rooms) {
+      setRoomList(
+        data.rooms!.map((room: RoomI) => ({
+          roomId: room.roomId,
+          roomName: room.roomName,
+          playersInRoom: room.playersInRoom.length,
+        }))
+      );
+    }
+  };
 
   const createRoom = (nickname: string) => {
     if (socket) {
@@ -50,15 +43,21 @@ const App: FC = () => {
     }
   };
 
-  // const updateGameState = (checkers: Checker[]) => {
-  //   setCheckers(checkers);
-  // };
-
   const sendCoordinates = (x: number, y: number, userId: number | undefined) => {
     if (socket) {
       socket.send(
         JSON.stringify({ action: "coordinates", coordinates: { x, y }, userId, creator })
       );
+    }
+  };
+
+  const endGame = (winner: "creator" | "guest" | undefined) => {
+    if (!winner) return;
+
+    if (winner === "creator" && creator) {
+      /////////////
+    } else if (winner === "guest" && !creator) {
+      /////////////
     }
   };
 
@@ -70,15 +69,7 @@ const App: FC = () => {
 
       switch (data.action) {
         case "room_list":
-          if (data.rooms) {
-            setRoomlist(
-              data.rooms!.map((room: RoomI) => ({
-                roomId: room.roomId,
-                roomName: room.roomName,
-                playersInRoom: room.playersInRoom.length,
-              }))
-            );
-          }
+          roomListSetter(data);
           break;
         case "create_user":
           setUserId(data.userId);
@@ -98,16 +89,10 @@ const App: FC = () => {
           if (data.chat) setRoomChat(data.chat);
           break;
         case "game_state":
-          if (data.gameState) {
-            // updateGameState(data.gameState);
-            setGameState(data.gameState);
-          }
+          if (data.gameState) setGameState(data.gameState);
           break;
         case "end_game":
-          if (data.winner === "creator" && creator) {
-            /////////////
-          } else {
-          }
+          endGame(data.winner);
           break;
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);
@@ -118,35 +103,17 @@ const App: FC = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.onclose = () => {
-        console.log("Подключение прервано");
-      };
+      socket.onclose = () => console.log("Подключение прервано");
     }
-
     return () => socket?.close();
   }, [socket]);
 
   return (
     <>
       {inGame ? (
-        <Room
-          nickname={nickname}
-          roomChat={roomChat}
-          sendChatMessage={sendChatMessage}
-          roomCreator={roomCreator}
-          roomGuest={roomGuest}
-          sendCoordinates={sendCoordinates}
-          userId={userId}
-          creator={creator}
-          gameState={gameState}
-        />
+        <Room sendChatMessage={sendChatMessage} sendCoordinates={sendCoordinates} />
       ) : (
-        <Lobby
-          createRoom={createRoom}
-          joinRoom={joinRoom}
-          roomList={roomList}
-          setCreator={setCreator}
-        />
+        <Lobby createRoom={createRoom} joinRoom={joinRoom} />
       )}
     </>
   );

@@ -1,10 +1,12 @@
-import { useSound } from "../lib/hooks";
 import { FC, MouseEvent } from "react";
+
+import { useSound } from "../lib/hooks";
 import Figures from "./Figures";
 
-import style from "./Field.module.scss";
 import Preloader from "./Preloader";
-import { GameState } from "../lib/types";
+
+import style from "./Field.module.scss";
+import { useCheckerStore } from "../store/store";
 
 const marginRow = [" ", "A", "B", "C", "D", "E", "F", "G", "H", " "];
 const marginColumn = ["8", "7", "6", "5", "4", "3", "2", "1"];
@@ -14,23 +16,15 @@ const WH_CELL = "#ffcb87";
 
 interface FieldProps {
   fieldSize: number;
-  roomCreator: string;
-  roomGuest: string;
-  userId: number | undefined;
-  creator: boolean;
-  gameState: GameState | undefined;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
 const Field: FC<FieldProps> = ({
   fieldSize,
-  roomCreator,
-  roomGuest,
-  userId,
-  creator,
-  gameState,
+
   sendCoordinates,
 }) => {
+  const { userId, creator, roomCreator, roomGuest, gameState } = useCheckerStore();
   // const playSound = useSound("../assets/sounds/checker.mp3");
 
   const onClickHandler = (e: MouseEvent) => {

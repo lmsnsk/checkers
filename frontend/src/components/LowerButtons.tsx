@@ -1,5 +1,7 @@
 import { FC, useState } from "react";
 
+import { useCheckerStore } from "../store/store";
+
 import style from "./LowerButtons.module.scss";
 
 interface LowerButtonsProps {
@@ -7,17 +9,12 @@ interface LowerButtonsProps {
   chosenRoom: number;
   createRoom: (inputNickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
-  setCreator: (creator: boolean) => void;
 }
 
-const LowerButtons: FC<LowerButtonsProps> = ({
-  chosenRoom,
-  isMobile,
-  joinRoom,
-  createRoom,
-  setCreator,
-}) => {
+const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, isMobile, joinRoom, createRoom }) => {
   const [inputNickname, setInputNickname] = useState("");
+
+  const setCreator = useCheckerStore((state) => state.setCreator);
 
   const inputNicknameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (inputNickname.length < 20) setInputNickname(e.target.value);
