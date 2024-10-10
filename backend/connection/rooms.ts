@@ -31,6 +31,40 @@ const startField = () => {
   return checkers;
 };
 
+export const deleteRoom = (
+  sessions: Session[],
+  users: Map<number, User>,
+  rooms: Room[],
+  data: { roomId: number }
+) => {
+  let indexForDeleteSession: number = -1;
+  let indexForDeleteRoom: number = -1;
+
+  sessions.forEach((session, index) => {
+    if (data.roomId === session.roomId) indexForDeleteSession = index;
+    session.players.creator.ws.send(
+      JSON.stringify({
+        action: "delete_room",
+        roomId: data.roomId,
+      })
+    );
+    session.players.guest?.ws.send(
+      JSON.stringify({
+        action: "delete_room",
+        roomId: data.roomId,
+      })
+    );
+  });
+  if (indexForDeleteSession >= 0) sessions.splice(indexForDeleteSession, 1);
+
+  rooms.forEach((room, index) => {
+    if (data.roomId === room.roomId) indexForDeleteRoom = index;
+  });
+  if (indexForDeleteRoom >= 0) rooms.splice(indexForDeleteRoom, 1);
+
+  sendAllUsersRoomList(users, rooms);
+};
+
 export const createRoom = (
   ws: WebSocket,
   data: CreateRoomData,

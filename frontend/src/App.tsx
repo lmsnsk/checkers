@@ -7,9 +7,9 @@ import { Data, RoomI } from "./lib/types";
 import { useCheckerStore } from "./store/store";
 
 const App: FC = () => {
-  const { nickname, userId, creator, inGame } = useCheckerStore();
-  const { setUserId, setInGame, setRoomCreator, setRoomGuest } = useCheckerStore();
-  const { setGameState, setRoomList, setRoomChat, setNickname } = useCheckerStore();
+  const { nickname, userId, creator, inGame, roomId, setRoomId } = useCheckerStore();
+  const { setUserId, setInGame, setRoomCreator, setRoomGuest, setWinner } = useCheckerStore();
+  const { setGameState, setRoomList, setRoomChat, setNickname, setCreator } = useCheckerStore();
 
   const socket: WebSocket | null = useSocket();
 
@@ -51,13 +51,17 @@ const App: FC = () => {
     }
   };
 
-  const endGame = (winner: "creator" | "guest" | undefined) => {
-    if (!winner) return;
-
-    if (winner === "creator" && creator) {
-      /////////////
-    } else if (winner === "guest" && !creator) {
-      /////////////
+  const leaveGame = () => {
+    if (socket) {
+      setWinner(undefined);
+      setInGame(false);
+      setRoomChat([]);
+      setNickname("");
+      setCreator(false);
+      setRoomCreator("");
+      setRoomGuest("");
+      setGameState(undefined);
+      socket.send(JSON.stringify({ action: "delete_room", roomId }));
     }
   };
 
@@ -75,7 +79,10 @@ const App: FC = () => {
           setUserId(data.userId);
           break;
         case "to_room":
-          if (data.nickname) setNickname(data.nickname);
+          if (data.nickname) {
+            setNickname(data.nickname);
+            setRoomId(data.roomId);
+          }
           setInGame(true);
           break;
         case "current_session":
@@ -92,7 +99,13 @@ const App: FC = () => {
           if (data.gameState) setGameState(data.gameState);
           break;
         case "end_game":
-          endGame(data.winner);
+          if (data.winner) setWinner(data.winner);
+          break;
+        case "delete_room":
+          if (data.roomId === roomId) {
+            setInGame(false);
+            console.log(inGame, roomId, data.roomId);
+          }
           break;
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);
@@ -111,7 +124,11 @@ const App: FC = () => {
   return (
     <>
       {inGame ? (
-        <Room sendChatMessage={sendChatMessage} sendCoordinates={sendCoordinates} />
+        <Room
+          sendChatMessage={sendChatMessage}
+          sendCoordinates={sendCoordinates}
+          leaveGame={leaveGame}
+        />
       ) : (
         <Lobby createRoom={createRoom} joinRoom={joinRoom} />
       )}

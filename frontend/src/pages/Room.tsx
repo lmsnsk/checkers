@@ -13,9 +13,10 @@ import style from "./Room.module.scss";
 interface RoomProps {
   sendChatMessage: (text: string) => void;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
+  leaveGame: () => void;
 }
 
-const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates }) => {
+const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) => {
   const [fieldSize, setFieldSize] = useState(0);
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +96,11 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates }) => {
                 {showPlayer(roomCreator, 1)}
                 {showPlayer(roomGuest, 2)}
               </div>
-              <Field fieldSize={fieldSize} sendCoordinates={sendCoordinates} />
+              <Field
+                fieldSize={fieldSize}
+                sendCoordinates={sendCoordinates}
+                leaveGame={leaveGame}
+              />
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 <Chat
                   fieldSize={fieldSize}
@@ -125,7 +130,11 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates }) => {
                   sendChatMessage={sendChatMessage}
                 />
               </div>
-              <Field fieldSize={fieldSize} sendCoordinates={sendCoordinates} />
+              <Field
+                fieldSize={fieldSize}
+                sendCoordinates={sendCoordinates}
+                leaveGame={leaveGame}
+              />
             </>
           )}
         </div>

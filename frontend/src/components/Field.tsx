@@ -7,6 +7,7 @@ import Preloader from "./Preloader";
 
 import style from "./Field.module.scss";
 import { useCheckerStore } from "../store/store";
+import EndGameMessage from "./EndGameMessage";
 
 const marginRow = [" ", "A", "B", "C", "D", "E", "F", "G", "H", " "];
 const marginColumn = ["8", "7", "6", "5", "4", "3", "2", "1"];
@@ -16,14 +17,11 @@ const WH_CELL = "#ffcb87";
 
 interface FieldProps {
   fieldSize: number;
+  leaveGame: () => void;
   sendCoordinates: (x: number, y: number, userId: number | undefined) => void;
 }
 
-const Field: FC<FieldProps> = ({
-  fieldSize,
-
-  sendCoordinates,
-}) => {
+const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
   const { userId, creator, roomCreator, roomGuest, gameState } = useCheckerStore();
   // const playSound = useSound("../assets/sounds/checker.mp3");
 
@@ -109,6 +107,7 @@ const Field: FC<FieldProps> = ({
             (gameState!.turn === "guest" && !creator)) &&
           roomGuest &&
           roomCreator && <span className={style.youTurn}>Ваш ход</span>}
+        <EndGameMessage leaveGame={leaveGame} />
       </div>
     </>
   );
