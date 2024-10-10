@@ -7,6 +7,7 @@ import backImg from "../assets/img/back.png";
 import { useCheckerStore } from "../store/store";
 
 import preloader from "../assets/img/ghost.gif";
+import logo from "../assets/img/log.svg";
 
 import style from "./Room.module.scss";
 
@@ -69,7 +70,12 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
 
   const title = () => {
     return (
-      <div className={`${style.title} ${isVertical ? style.verticalTitle : ""}`}>ШАШКИ ОНЛАЙН</div>
+      <>
+        <div className={`${style.title} ${isVertical ? style.verticalTitle : ""}`}>
+          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
+          ШАШКИ ОНЛАЙН
+        </div>
+      </>
     );
   };
 

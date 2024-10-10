@@ -7,6 +7,9 @@
   gap: 40px;
 
   .title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     position: absolute;
     top: 0;
     color: white;

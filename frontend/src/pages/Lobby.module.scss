@@ -13,9 +13,6 @@
     justify-content: center;
     align-items: center;
 
-    // .titleImg {
-    // }
-
     .title {
       display: flex;
       flex-direction: column;
@@ -27,7 +24,7 @@
         font-size: 3.75rem;
       }
       .secondWord {
-        font-size: 2.25rem;
+        font-size: 2rem;
       }
     }
   }
@@ -48,7 +45,7 @@
           font-size: 2.25rem;
         }
         .secondWord {
-          font-size: 1.5rem;
+          font-size: 1.25rem;
         }
       }
     }
