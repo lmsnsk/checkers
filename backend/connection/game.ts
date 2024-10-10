@@ -1,22 +1,7 @@
 import { WebSocket } from "ws";
 
-import { CoordinatesData, Session, JoinRoomData, GameState, Checker } from "../lib/types";
-import {
-  checkFightKingMove,
-  checkFightMove,
-  checkPossibleMoves,
-  checkWinner,
-  createField,
-  firstClickRealization,
-  move,
-  resetChosen,
-} from "../gameLogic/gameLogic";
-
-export const reverseCoordinates = (checkers: Checker[]) => {
-  for (const checker of checkers) {
-    checker.reverseCoordinates();
-  }
-};
+import * as logic from "../gameLogic/gameLogic";
+import { CoordinatesData, Session, GameState } from "../lib/types";
 
 const sendGameState = (ws: WebSocket, gameState: GameState) => {
   ws.send(JSON.stringify({ action: "game_state", gameState }));
@@ -37,6 +22,66 @@ const endGame = (session: Session) => {
   );
 };
 
+export const startGameState = (ws: WebSocket, session: Session) => {
+  logic.reverseCoordinates(session.gameState.checkers);
+  ws.send(JSON.stringify({ action: "current_session", session }));
+  logic.reverseCoordinates(session.gameState.checkers);
+
+  logic.checkPossibleMoves(session.gameState, "white", true);
+  session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
+  logic.resetCanMove(session.gameState.checkers);
+};
+
+const firstClickOnChecker = (ws: WebSocket, gameState: GameState, data: CoordinatesData) => {
+  if (logic.firstClickRealization(data.coordinates, gameState)) {
+    sendGameState(ws, gameState);
+  }
+};
+
+const secondClickOnChecker = (
+  ws: WebSocket,
+  session: Session,
+  data: CoordinatesData,
+  isCreator: boolean
+) => {
+  const gameState = session.gameState;
+
+  if (logic.move(data.coordinates, gameState)) {
+    const oppositeWs = isCreator ? session.players.guest!.ws : session.players.creator.ws;
+    const checkerWithAddMove = gameState.checkerAdditionalMove;
+    let addMove = false;
+
+    if (checkerWithAddMove) {
+      const field = logic.createField(gameState.checkers);
+      const color = isCreator ? "white" : "black";
+
+      addMove = checkerWithAddMove.isKing
+        ? logic.checkFightKingMove(gameState, field, checkerWithAddMove, color, isCreator)
+        : logic.checkFightMove(gameState, field, checkerWithAddMove, color, isCreator);
+    }
+
+    if (!addMove) {
+      gameState.turn = gameState.turn === "creator" ? "guest" : "creator";
+      gameState.showPossibleTurns = false;
+      gameState.firstClickDone = false;
+      gameState.needToEat = false;
+      logic.resetChosen(session.gameState.checkers);
+    }
+    sendGameState(ws, gameState);
+    logic.reverseCoordinates(session.gameState.checkers);
+
+    if (!addMove) {
+      logic.checkPossibleMoves(gameState, isCreator ? "black" : "white", !isCreator);
+    }
+    sendGameState(oppositeWs, gameState);
+
+    if (addMove) {
+      logic.reverseCoordinates(session.gameState.checkers);
+    }
+    logic.checkWinner(gameState);
+  }
+};
+
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
   sessions.forEach((session) => {
     if (!session.players.guest) return;
@@ -52,46 +97,10 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
       if (!gameState.firstClickDone) {
-        if (firstClickRealization(data.coordinates, gameState)) {
-          sendGameState(ws, gameState);
-        }
+        firstClickOnChecker(ws, gameState, data);
       } else {
-        if (move(data.coordinates, gameState)) {
-          const oppositeWs = isCreator ? guest.ws : creator.ws;
-          const checker = gameState.checkerAdditionalMove;
-          let additionalMove = false;
-
-          if (checker) {
-            const field = createField(gameState.checkers);
-            const color = isCreator ? "white" : "black";
-
-            additionalMove = checker.isKing
-              ? checkFightKingMove(gameState, field, checker, color, isCreator)
-              : checkFightMove(gameState, field, checker, color, isCreator);
-          }
-
-          if (!additionalMove) {
-            gameState.turn = gameState.turn === "creator" ? "guest" : "creator";
-            gameState.showPossibleTurns = false;
-            gameState.firstClickDone = false;
-            gameState.needToEat = false;
-            resetChosen(session.gameState.checkers);
-          }
-          sendGameState(ws, gameState);
-          reverseCoordinates(session.gameState.checkers);
-
-          if (!additionalMove) {
-            checkPossibleMoves(gameState, isCreator ? "black" : "white", !isCreator);
-          }
-          sendGameState(oppositeWs, gameState);
-
-          if (additionalMove) {
-            reverseCoordinates(session.gameState.checkers);
-          }
-          checkWinner(gameState);
-        }
+        secondClickOnChecker(ws, session, data, isCreator);
       }
-
       if (gameState.winner) endGame(session);
     }
   });

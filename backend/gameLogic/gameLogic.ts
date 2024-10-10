@@ -1,5 +1,4 @@
-import { coordinates } from "./../connection/game";
-import { Checker, Coord, FigKind, GameState, PossibleTurns } from "../lib/types";
+import { Checker, Coord, FigKind, GameState, PossibleTurns, Session } from "../lib/types";
 
 export const createField = (checkers: Checker[]): FigKind[][] => {
   const arr: FigKind[][] = new Array(8).fill(0).map(() => new Array(8).fill(0));
@@ -18,6 +17,12 @@ export const resetCanMove = (checkers: Checker[]): void => {
 export const resetChosen = (checkers: Checker[]): void => {
   for (let checker of checkers) {
     if (checker.isChosen) checker.isChosen = false;
+  }
+};
+
+export const reverseCoordinates = (checkers: Checker[]) => {
+  for (const checker of checkers) {
+    checker.reverseCoordinates();
   }
 };
 
@@ -158,6 +163,7 @@ export const checkFightKingMove = (
         });
       }
 
+      if (gameState.checkers.length === 2 && checker.id === 0) console.log(direction, xx, yy);
       if (
         (direction === "lt" || direction === "rt" ? y - i > 0 : y + i <= 6) &&
         (direction === "lt" || direction === "lb" ? x - i > 0 : x + i <= 6) &&
@@ -297,6 +303,9 @@ export const move = (coord: Coord, gameState: GameState) => {
       if (gameState.needToEat) {
         eatChecker(gameState, checker, coord);
         gameState.checkerAdditionalMove = checker;
+      } else {
+        gameState.checkerAdditionalMove = undefined;
+        gameState.kingEatDirection = undefined;
       }
 
       checker.move(coord.x, coord.y);

@@ -1,17 +1,16 @@
 import { WebSocket, WebSocketServer } from "ws";
 
 import { messages } from "./chat";
-import { userIdGenerator } from "../lib/helpers";
-import { createRoom, joinRoom } from "./rooms";
 import { coordinates } from "./game";
+import { createRoom, joinRoom } from "./rooms";
+import { userIdGenerator } from "../lib/helpers";
 import { rooms, sessions, users } from "../database/database";
 
 const onConnection = (ws: WebSocket) => {
-  // console.log("Client connected");
   const currentUserId = userIdGenerator();
+  console.log(`Client id: ${currentUserId} connected`);
   users.set(currentUserId, { ws, inGame: false });
   ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
-
   ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
 };
 
@@ -20,9 +19,9 @@ const closeConnection = (ws: WebSocket) => {
   users.forEach((user, key) => {
     if (user.ws === ws) {
       users.delete(key);
+      console.log(`Client id: ${key} disconnected`);
     }
   });
-  // console.log("Client disconnected");
 };
 
 export const wssConnection = () => {

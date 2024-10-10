@@ -46,7 +46,7 @@ export class Checker {
 
   isChosen = false;
   canMove = false;
-  isKing = true;
+  isKing = false;
 
   move(x: number, y: number) {
     this.x = x;

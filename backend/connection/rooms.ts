@@ -1,9 +1,8 @@
 import { WebSocket } from "ws";
 
-import { Checker, CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
+import { startGameState } from "./game";
 import { dateToString, initialField } from "../lib/helpers";
-import { reverseCoordinates } from "./game";
-import { checkPossibleMoves, resetCanMove } from "../gameLogic/gameLogic";
+import { Checker, CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
 
 export const sendAllUsersRoomList = (users: Map<number, User>, rooms: Room[]) => {
   users.forEach((user) => {
@@ -110,13 +109,7 @@ export const joinRoom = (
         nickname: data.nickname,
         pieceType: "black",
       };
-      reverseCoordinates(session.gameState.checkers);
-      ws.send(JSON.stringify({ action: "current_session", session }));
-      reverseCoordinates(session.gameState.checkers);
-
-      checkPossibleMoves(session.gameState, "white", true);
-      session.players.creator.ws.send(JSON.stringify({ action: "current_session", session }));
-      resetCanMove(session.gameState.checkers);
+      startGameState(ws, session);
     }
   });
 
