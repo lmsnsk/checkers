@@ -10,6 +10,7 @@ import preloader from "../assets/img/ghost.gif";
 import logo from "../assets/img/log.svg";
 
 import style from "./Room.module.scss";
+import ConfirmWindow from "../components/ConfirmWindow";
 
 interface RoomProps {
   sendChatMessage: (text: string) => void;
@@ -22,14 +23,17 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
   const [isVertical, setIsVertical] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isChatOpened, setIsChatOpened] = useState(false);
+  const [confirmWindow, setConfirmWindow] = useState(false);
 
   const { roomCreator, roomGuest } = useCheckerStore();
 
   useEffect(() => {
     const fieldSizeCalc = () => {
       let size = 0;
-      if (window.innerWidth > 768 && window.innerHeight > 768) {
+      if (window.innerWidth > 1280 && window.innerHeight > 768) {
         size = 600;
+      } else if (window.innerWidth > 768 && window.innerHeight > 768) {
+        size = 500;
       } else if (window.innerWidth > 550 && window.innerHeight > 550) {
         size = 500;
       } else if (window.innerWidth > 450 && window.innerHeight > 450) {
@@ -74,6 +78,9 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
         <div className={`${style.title} ${isVertical ? style.verticalTitle : ""}`}>
           <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
           ШАШКИ ОНЛАЙН
+          <button className={style.back} onClick={() => setConfirmWindow(true)}>
+            <img src={backImg} alt="back" />
+          </button>
         </div>
       </>
     );
@@ -144,6 +151,13 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
             </>
           )}
         </div>
+      )}
+      {confirmWindow && (
+        <ConfirmWindow
+          text={"ПОКИНУТЬ КОМНАТУ?"}
+          agreeFn={() => leaveGame()}
+          setConfirmWindow={setConfirmWindow}
+        />
       )}
     </>
   );

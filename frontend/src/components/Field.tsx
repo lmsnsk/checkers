@@ -1,13 +1,11 @@
 import { FC, MouseEvent } from "react";
 
-import { useSound } from "../lib/hooks";
 import Figures from "./Figures";
+import EndGameMessage from "./EndGameMessage";
 
-import Preloader from "./Preloader";
+import { useCheckerStore } from "../store/store";
 
 import style from "./Field.module.scss";
-import { useCheckerStore } from "../store/store";
-import EndGameMessage from "./EndGameMessage";
 
 const marginRow = [" ", "A", "B", "C", "D", "E", "F", "G", "H", " "];
 const marginColumn = ["8", "7", "6", "5", "4", "3", "2", "1"];
@@ -23,7 +21,6 @@ interface FieldProps {
 
 const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
   const { userId, creator, roomCreator, roomGuest, gameState } = useCheckerStore();
-  // const playSound = useSound("../assets/sounds/checker.mp3");
 
   const onClickHandler = (e: MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -81,7 +78,9 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
   return (
     <>
       <div className={style.main}>
-        <span className={style.enemyName}>{creator ? roomGuest : roomCreator}</span>
+        {roomCreator && roomGuest && (
+          <span className={style.enemyName}>{creator ? roomGuest : roomCreator}</span>
+        )}
         {gameState &&
           ((gameState.turn === "creator" && !creator) || (gameState.turn === "guest" && creator)) &&
           roomGuest &&
@@ -100,8 +99,10 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
           {drawMarginColumn("right")}
         </div>
         {drawMarginRow("bottom")}
-        {(!roomCreator || !roomGuest) && <Preloader />}
-        <span className={style.playerName}>{creator ? roomCreator : roomGuest}</span>
+        {(!roomCreator || !roomGuest) && <div className={style.cloack}></div>}
+        {roomCreator && roomGuest && (
+          <span className={style.playerName}>{creator ? roomCreator : roomGuest}</span>
+        )}
         {gameState &&
           ((gameState!.turn === "creator" && creator) ||
             (gameState!.turn === "guest" && !creator)) &&

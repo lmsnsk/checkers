@@ -1,0 +1,50 @@
+.main {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.3);
+
+  .window {
+    padding: 25px 40px;
+    box-sizing: border-box;
+    background-color: white;
+    box-shadow: 0 0 15px black;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    font-weight: bold;
+    text-align: center;
+
+    .text {
+      font-size: 28px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+
+      button {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        background-color: rgb(30, 30, 45);
+        color: white;
+        font-weight: 400;
+        font-size: 20px;
+
+        &:hover {
+          box-shadow: 0 0 10px 0 rgb(255, 255, 255);
+        }
+      }
+    }
+  }
+}

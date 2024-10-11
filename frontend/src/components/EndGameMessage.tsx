@@ -11,10 +11,10 @@ interface EndGameMessageProps {
 const EndGameMessage: FC<EndGameMessageProps> = ({ leaveGame }) => {
   const [waitToRepeat, setWaitToRepeat] = useState(false);
 
-  const { winner, creator } = useCheckerStore();
+  const { winner, creator, socket, roomId } = useCheckerStore();
 
   const onRepeatGameHandler = () => {
-    // setWinner(undefined);
+    socket?.send(JSON.stringify({ action: "reset_game", roomId }));
     setWaitToRepeat(true);
   };
 
@@ -29,9 +29,7 @@ const EndGameMessage: FC<EndGameMessageProps> = ({ leaveGame }) => {
                 : "ПОРАЖЕНИЕ"}
             </h3>
             <div className={style.buttons}>
-              <button disabled={waitToRepeat} onClick={() => leaveGame()}>
-                ПОКИНУТЬ ИГРУ
-              </button>
+              <button onClick={() => leaveGame()}>ПОКИНУТЬ ИГРУ</button>
               <button disabled={waitToRepeat} onClick={onRepeatGameHandler}>
                 {waitToRepeat ? "ОЖИДАЕМ . . ." : "СЫГРАТЬ ЕЩЕ"}
               </button>

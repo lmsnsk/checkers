@@ -77,4 +77,5 @@ export type Data = {
   rooms?: RoomI[];
   winner?: "creator" | "guest";
   chat?: { nickname: string; date: string; text: string }[];
+  move?: boolean;
 };

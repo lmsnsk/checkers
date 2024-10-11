@@ -1,10 +1,12 @@
 import { WebSocket } from "ws";
 
 import * as logic from "../gameLogic/gameLogic";
-import { CoordinatesData, Session, GameState } from "../lib/types";
+import { CoordinatesData, Session, GameState, ResetGameData } from "../lib/types";
+import { startField } from "../lib/helpers";
+import { reseterGame } from "../database/database";
 
-const sendGameState = (ws: WebSocket, gameState: GameState) => {
-  ws.send(JSON.stringify({ action: "game_state", gameState }));
+const sendGameState = (ws: WebSocket, gameState: GameState, move: boolean) => {
+  ws.send(JSON.stringify({ action: "game_state", gameState, move }));
 };
 
 const endGame = (session: Session) => {
@@ -22,9 +24,9 @@ const endGame = (session: Session) => {
   );
 };
 
-export const startGameState = (ws: WebSocket, session: Session) => {
+export const startGameState = (session: Session) => {
   logic.reverseCoordinates(session.gameState.checkers);
-  ws.send(JSON.stringify({ action: "current_session", session }));
+  session.players.guest?.ws.send(JSON.stringify({ action: "current_session", session }));
   logic.reverseCoordinates(session.gameState.checkers);
 
   logic.checkPossibleMoves(session.gameState, "white", true);
@@ -34,7 +36,7 @@ export const startGameState = (ws: WebSocket, session: Session) => {
 
 const firstClickOnChecker = (ws: WebSocket, gameState: GameState, data: CoordinatesData) => {
   if (logic.firstClickRealization(data.coordinates, gameState)) {
-    sendGameState(ws, gameState);
+    sendGameState(ws, gameState, false);
   }
 };
 
@@ -67,13 +69,13 @@ const secondClickOnChecker = (
       gameState.needToEat = false;
       logic.resetChosen(session.gameState.checkers);
     }
-    sendGameState(ws, gameState);
+    sendGameState(ws, gameState, true);
     logic.reverseCoordinates(session.gameState.checkers);
 
     if (!addMove) {
       logic.checkPossibleMoves(gameState, isCreator ? "black" : "white", !isCreator);
     }
-    sendGameState(oppositeWs, gameState);
+    sendGameState(oppositeWs, gameState, true);
 
     if (addMove) {
       logic.reverseCoordinates(session.gameState.checkers);
@@ -102,6 +104,34 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
         secondClickOnChecker(ws, session, data, isCreator);
       }
       if (gameState.winner) endGame(session);
+    }
+  });
+};
+
+export const resetGame = (data: ResetGameData, sessions: Session[]) => {
+  if (!reseterGame.has(data.roomId)) {
+    reseterGame.add(data.roomId);
+    return;
+  }
+
+  reseterGame.delete(data.roomId);
+
+  sessions.forEach((session) => {
+    if (session.roomId === data.roomId) {
+      const gameState = session.gameState;
+
+      gameState.turn = "creator";
+      gameState.needToEat = false;
+      gameState.firstClickDone = false;
+      gameState.showPossibleTurns = false;
+      gameState.winner = undefined;
+      gameState.kingEatDirection = undefined;
+      gameState.checkerAdditionalMove = undefined;
+      gameState.enemiesForEat = [];
+      gameState.possibleTurns = [];
+      gameState.checkers = startField();
+
+      startGameState(session);
     }
   });
 };

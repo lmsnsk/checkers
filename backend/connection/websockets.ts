@@ -1,7 +1,7 @@
 import { WebSocket, WebSocketServer } from "ws";
 
 import { messages } from "./chat";
-import { coordinates } from "./game";
+import { coordinates, resetGame } from "./game";
 import { createRoom, deleteRoom, joinRoom } from "./rooms";
 import { userIdGenerator } from "../lib/helpers";
 import { rooms, sessions, users } from "../database/database";
@@ -50,9 +50,9 @@ export const wssConnection = () => {
           break;
         case "delete_room":
           deleteRoom(sessions, users, rooms, data);
-          console.log(sessions);
-          console.log(rooms);
-
+          break;
+        case "reset_game":
+          resetGame(data, sessions);
           break;
       }
     });

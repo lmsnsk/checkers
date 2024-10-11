@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
+import { useCheckerStore } from "../store/store";
 
-export const useSocket = () => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
+export const useSocket = (setNoServerConnection: (noServerConnection: boolean) => void) => {
+  const { socket, setSocket } = useCheckerStore();
 
   useEffect(() => {
     const newSocket = new WebSocket("ws://localhost:8080/ws/checkers");
     setSocket(newSocket);
     newSocket.onopen = () => {
       console.log("Подключение установлено");
+      setNoServerConnection(false);
     };
-  }, []);
+  }, [setSocket, setNoServerConnection]);
 
   return socket;
 };

@@ -1,17 +1,22 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 
 import Room from "./pages/Room";
 import Lobby from "./pages/Lobby";
-import { useSocket } from "./lib/hooks";
+import ServerError from "./components/ServerError";
+import { useSocket, useSound } from "./lib/hooks";
 import { Data, RoomI } from "./lib/types";
 import { useCheckerStore } from "./store/store";
 
 const App: FC = () => {
-  const { nickname, userId, creator, inGame, roomId, setRoomId } = useCheckerStore();
+  const { nickname, userId, creator, inGame, roomId, socket, setRoomId } = useCheckerStore();
   const { setUserId, setInGame, setRoomCreator, setRoomGuest, setWinner } = useCheckerStore();
   const { setGameState, setRoomList, setRoomChat, setNickname, setCreator } = useCheckerStore();
 
-  const socket: WebSocket | null = useSocket();
+  const [noServerConnection, setNoServerConnection] = useState(true);
+
+  const playSound = useSound("/checker.mp3");
+
+  useSocket(setNoServerConnection);
 
   const roomListSetter = (data: Data) => {
     if (data.rooms) {
@@ -26,29 +31,19 @@ const App: FC = () => {
   };
 
   const createRoom = (nickname: string) => {
-    if (socket) {
-      socket.send(JSON.stringify({ action: "create_room", nickname, userId }));
-    }
+    socket?.send(JSON.stringify({ action: "create_room", nickname, userId }));
   };
 
   const joinRoom = (nickname: string, roomId: number) => {
-    if (socket) {
-      socket.send(JSON.stringify({ action: "join_room", nickname, userId, roomId }));
-    }
+    socket?.send(JSON.stringify({ action: "join_room", nickname, userId, roomId }));
   };
 
   const sendChatMessage = (text: string) => {
-    if (socket) {
-      socket.send(JSON.stringify({ action: "chat_message", text, nickname }));
-    }
+    socket?.send(JSON.stringify({ action: "chat_message", text, nickname }));
   };
 
   const sendCoordinates = (x: number, y: number, userId: number | undefined) => {
-    if (socket) {
-      socket.send(
-        JSON.stringify({ action: "coordinates", coordinates: { x, y }, userId, creator })
-      );
-    }
+    socket?.send(JSON.stringify({ action: "coordinates", coordinates: { x, y }, userId, creator }));
   };
 
   const leaveGame = () => {
@@ -75,9 +70,11 @@ const App: FC = () => {
         case "room_list":
           roomListSetter(data);
           break;
+
         case "create_user":
           setUserId(data.userId);
           break;
+
         case "to_room":
           if (data.nickname) {
             setNickname(data.nickname);
@@ -85,28 +82,35 @@ const App: FC = () => {
           }
           setInGame(true);
           break;
+
         case "current_session":
           if (data.session) {
+            setWinner(undefined);
             setRoomCreator(data.session.players.creator.nickname);
             setRoomGuest(data.session.players.guest?.nickname ?? "");
             setGameState(data.session.gameState);
           }
           break;
+
         case "chat_message":
           if (data.chat) setRoomChat(data.chat);
           break;
+
         case "game_state":
-          if (data.gameState) setGameState(data.gameState);
+          if (data.gameState) {
+            setGameState(data.gameState);
+            if (data.move) playSound();
+          }
           break;
+
         case "end_game":
           if (data.winner) setWinner(data.winner);
           break;
+
         case "delete_room":
-          if (data.roomId === roomId) {
-            setInGame(false);
-            console.log(inGame, roomId, data.roomId);
-          }
+          if (data.roomId === roomId) setInGame(false);
           break;
+
         case "check_game": // reconnect
           if (data.inGame) setInGame(true);
           break;
@@ -116,7 +120,11 @@ const App: FC = () => {
 
   useEffect(() => {
     if (socket) {
-      socket.onclose = () => console.log("Подключение прервано");
+      socket.onclose = () => {
+        console.log("Подключение прервано");
+        setNoServerConnection(true);
+        setTimeout(() => window.location.reload(), 3000);
+      };
     }
     return () => socket?.close();
   }, [socket]);
@@ -132,6 +140,7 @@ const App: FC = () => {
       ) : (
         <Lobby createRoom={createRoom} joinRoom={joinRoom} />
       )}
+      {noServerConnection && <ServerError />}
     </>
   );
 };

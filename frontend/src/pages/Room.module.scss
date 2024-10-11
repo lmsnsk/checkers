@@ -16,6 +16,25 @@
     font-weight: bold;
     margin-top: 20px;
     font-size: 2.5rem;
+
+    .back {
+      position: absolute;
+      top: 60px;
+      background-color: transparent;
+      border: none;
+      padding: 0;
+
+      img {
+        opacity: 0.5;
+        width: 40px;
+        transition: 0.2s;
+        cursor: pointer;
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
   }
 
   .verticalTitle {

@@ -14,6 +14,7 @@ interface State {
   roomGuest: string;
   gameState: GameState | undefined;
   winner: "creator" | "guest" | undefined;
+  socket: WebSocket | undefined;
   setRoomList: (roomList: RoomListItem[]) => void;
   setRoomChat: (roomChat: RoomChat[]) => void;
   setNickname: (nickname: string) => void;
@@ -25,6 +26,7 @@ interface State {
   setRoomGuest: (roomGuest: string) => void;
   setGameState: (gameState: GameState | undefined) => void;
   setWinner: (winner: "creator" | "guest" | undefined) => void;
+  setSocket: (socket: WebSocket) => void;
 }
 
 export const useCheckerStore = create<State>()((set) => ({
@@ -39,6 +41,7 @@ export const useCheckerStore = create<State>()((set) => ({
   roomGuest: "",
   gameState: undefined,
   winner: undefined,
+  socket: undefined,
   setRoomList: (roomList: RoomListItem[]) => set({ roomList }),
   setRoomChat: (roomChat: RoomChat[]) => set({ roomChat }),
   setNickname: (nickname: string) => set({ nickname }),
@@ -50,4 +53,5 @@ export const useCheckerStore = create<State>()((set) => ({
   setRoomGuest: (roomGuest: string) => set({ roomGuest }),
   setGameState: (gameState: GameState | undefined) => set({ gameState }),
   setWinner: (winner: "creator" | "guest" | undefined) => set({ winner }),
+  setSocket: (socket: WebSocket) => set({ socket }),
 }));

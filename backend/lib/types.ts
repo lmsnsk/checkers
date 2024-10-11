@@ -115,3 +115,9 @@ export interface CoordinatesData {
   userId: number;
   creator: boolean;
 }
+
+export interface ResetGameData {
+  action: "reset_game";
+  userId: number;
+  roomId: number;
+}
