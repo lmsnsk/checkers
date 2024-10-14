@@ -1,3 +1,3 @@
 # Checkers-Game
 
-Шашки c чатиком на NextJS + Express
+Шашки c чатиком на ReactJS + Express
