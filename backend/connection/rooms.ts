@@ -4,6 +4,8 @@ import { startGameState } from "./game";
 import { dateToString, startField } from "../lib/helpers";
 import { CreateRoomData, JoinRoomData, Room, Session, User } from "../lib/types";
 
+let roomIdCounter = 0;
+
 export const sendAllUsersRoomList = (users: Map<number, User>, rooms: Room[]) => {
   users.forEach((user) => {
     user.ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
@@ -53,9 +55,10 @@ export const createRoom = (
 ) => {
   users.set(data.userId, { ws, inGame: true, nickname: data.nickname });
 
-  const roomId = rooms.length + 1;
+  roomIdCounter++;
+
   const room = {
-    roomId: roomId,
+    roomId: roomIdCounter,
     roomName: data.nickname,
     created: dateToString(),
     playersInRoom: [{ nickname: data.nickname, userId: data.userId, pieceType: "white" }],
@@ -63,7 +66,7 @@ export const createRoom = (
   rooms.push(room);
 
   const currentSession: Session = {
-    roomId: roomId,
+    roomId: roomIdCounter,
     created: dateToString(),
     gameState: {
       kingEatDirection: undefined,
@@ -92,7 +95,7 @@ export const createRoom = (
       action: "to_room",
       nickname: data.nickname,
       userId: data.userId,
-      roomId,
+      roomIdCounter,
     })
   );
 };
@@ -104,7 +107,9 @@ export const joinRoom = (
   rooms: Room[],
   sessions: Session[]
 ) => {
-  if (rooms[data.roomId - 1].playersInRoom.length !== 1) return;
+  const currentRoom = rooms.find((room) => room.roomId === data.roomId);
+
+  if (currentRoom?.playersInRoom.length !== 1) return;
 
   users.set(data.userId, { ws, inGame: true, nickname: data.nickname });
 
