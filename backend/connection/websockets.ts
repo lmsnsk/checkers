@@ -15,7 +15,6 @@ const onConnection = (ws: WebSocket) => {
 };
 
 const closeConnection = (ws: WebSocket) => {
-  // sendAllUsersRoomList(users, rooms);
   users.forEach((user, key) => {
     if (user.ws === ws) {
       users.delete(key);

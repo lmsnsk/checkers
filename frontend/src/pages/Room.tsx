@@ -4,13 +4,13 @@ import Chat from "../components/Chat";
 import Field from "../components/Field";
 import chatImg from "../assets/img/chat.png";
 import backImg from "../assets/img/back.png";
+import ConfirmWindow from "../components/ConfirmWindow";
 import { useCheckerStore } from "../store/store";
 
 import preloader from "../assets/img/ghost.gif";
 import logo from "../assets/img/log.svg";
 
 import style from "./Room.module.scss";
-import ConfirmWindow from "../components/ConfirmWindow";
 
 interface RoomProps {
   sendChatMessage: (text: string) => void;
@@ -76,11 +76,11 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
     return (
       <>
         <div className={`${style.title} ${isVertical ? style.verticalTitle : ""}`}>
-          <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} />
-          ШАШКИ ОНЛАЙН
+          {/* <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} /> */}
           <button className={style.back} onClick={() => setConfirmWindow(true)}>
             <img src={backImg} alt="back" />
           </button>
+          ШАШКИ ОНЛАЙН
         </div>
       </>
     );
@@ -98,6 +98,14 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
     );
   };
 
+  const showChat = () => {
+    return <Chat fieldSize={fieldSize} isVertical={isVertical} sendChatMessage={sendChatMessage} />;
+  };
+
+  const showField = () => {
+    return <Field fieldSize={fieldSize} sendCoordinates={sendCoordinates} leaveGame={leaveGame} />;
+  };
+
   return (
     <>
       {isLoading && (
@@ -109,17 +117,9 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
                 {showPlayer(roomCreator, 1)}
                 {showPlayer(roomGuest, 2)}
               </div>
-              <Field
-                fieldSize={fieldSize}
-                sendCoordinates={sendCoordinates}
-                leaveGame={leaveGame}
-              />
+              {showField()}
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
-                <Chat
-                  fieldSize={fieldSize}
-                  isVertical={isVertical}
-                  sendChatMessage={sendChatMessage}
-                />
+                {showChat()}
               </div>
               <button
                 disabled={roomGuest ? false : true}
@@ -131,23 +131,15 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
             </>
           ) : (
             <>
-              <div>
+              <section className={style.leftSection}>
                 {title()}
                 <div className={style.players}>
                   {showPlayer(roomCreator, 1)}
                   {showPlayer(roomGuest, 2)}
                 </div>
-                <Chat
-                  fieldSize={fieldSize}
-                  isVertical={isVertical}
-                  sendChatMessage={sendChatMessage}
-                />
-              </div>
-              <Field
-                fieldSize={fieldSize}
-                sendCoordinates={sendCoordinates}
-                leaveGame={leaveGame}
-              />
+                {showChat()}
+              </section>
+              {showField()}
             </>
           )}
         </div>
@@ -155,7 +147,7 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
       {confirmWindow && (
         <ConfirmWindow
           text={"ПОКИНУТЬ КОМНАТУ?"}
-          agreeFn={() => leaveGame()}
+          agreeFn={leaveGame}
           setConfirmWindow={setConfirmWindow}
         />
       )}

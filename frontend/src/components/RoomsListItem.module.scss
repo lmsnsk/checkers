@@ -4,6 +4,7 @@
   cursor: auto;
   user-select: none;
   border-bottom: 2px solid rgb(180, 180, 180);
+  font-size: 1.25rem;
 
   .columnElement {
     display: flex;
@@ -19,5 +20,23 @@
     color: white;
     font-weight: bold;
     padding-right: 8px;
+  }
+}
+
+.chosen {
+  background-color: rgb(180, 180, 180);
+}
+
+.mainTitle {
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) or (max-height: 768px) {
+  .main {
+    font-size: 1rem;
+  }
+
+  .mainTitle {
+    font-size: 1.25rem;
   }
 }

@@ -13,31 +13,24 @@ export interface IListItem {
 }
 
 interface RoomsListProps {
-  isMobile: boolean;
   createRoom: (nickname: string) => void;
   joinRoom: (nickname: string, id: number) => void;
 }
 
-const RoomsList: FC<RoomsListProps> = ({ isMobile, joinRoom, createRoom }) => {
+const RoomsList: FC<RoomsListProps> = ({ joinRoom, createRoom }) => {
   const [chosenRoom, setChosenRoom] = useState(0);
   const roomList = useCheckerStore((state) => state.roomList);
 
   return (
     <>
       <div className={style.main}>
-        <RoomsListItem
-          isTitle={true}
-          textSize={isMobile ? 1.125 : 1.5}
-          firstCol="Комната"
-          secondCol="Игроки"
-        />
+        <RoomsListItem isTitle={true} firstCol="Комната" secondCol="Игроки" />
         <div className={style.itemList}>
           {roomList.map((room) => (
             <Fragment key={room.roomId}>
               <RoomsListItem
                 isTitle={false}
                 id={room.roomId}
-                textSize={isMobile ? 1 : 1.25}
                 firstCol={room.roomName}
                 secondCol={`${room.playersInRoom.toString()} / 2`}
                 isChosen={chosenRoom === room.roomId ? true : false}
@@ -47,12 +40,7 @@ const RoomsList: FC<RoomsListProps> = ({ isMobile, joinRoom, createRoom }) => {
           ))}
         </div>
       </div>
-      <LowerButtons
-        chosenRoom={chosenRoom}
-        isMobile={isMobile}
-        createRoom={createRoom}
-        joinRoom={joinRoom}
-      />
+      <LowerButtons chosenRoom={chosenRoom} createRoom={createRoom} joinRoom={joinRoom} />
     </>
   );
 };

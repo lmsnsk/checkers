@@ -18,12 +18,16 @@
     }
   }
 
+  .errorInput {
+    outline: 2px solid red;
+  }
+
   .buttonBox {
     display: flex;
     justify-content: space-between;
     gap: 8px;
 
-    & > button {
+    .button {
       background-color: white;
       padding: 8px;
       border-radius: 8px;
@@ -40,9 +44,20 @@
         box-shadow: 0 0 10px 0 rgb(255, 255, 255);
       }
     }
+
+    .disabledButton {
+      background-color: white;
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: 800;
+      border: none;
+      color: gray;
+    }
   }
 }
 
-.mobileMain {
-  flex-direction: column;
+@media (max-width: 768px) or (max-height: 768px) {
+  .main {
+    flex-direction: column;
+  }
 }

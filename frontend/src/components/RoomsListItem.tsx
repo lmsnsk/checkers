@@ -5,7 +5,6 @@ import style from "./RoomsListItem.module.scss";
 interface RoomsListItemProps {
   id?: number;
   isTitle: boolean;
-  textSize: number;
   isChosen?: boolean;
   firstCol: string;
   secondCol: string;
@@ -15,7 +14,6 @@ interface RoomsListItemProps {
 const RoomsListItem: FC<RoomsListItemProps> = ({
   id,
   isChosen,
-  textSize,
   firstCol,
   isTitle,
   secondCol,
@@ -23,8 +21,7 @@ const RoomsListItem: FC<RoomsListItemProps> = ({
 }) => {
   return (
     <div
-      className={style.main}
-      style={{ backgroundColor: isChosen ? "rgb(180,180,180)" : "", fontSize: textSize + "rem" }}
+      className={`${style.main} ${isTitle ? style.mainTitle : ""}  ${isChosen ? style.chosen : ""}`}
       onClick={setChosenRoom && id ? () => setChosenRoom(id) : undefined}
     >
       <div className={`${style.columnElement} ${isTitle ? style.title : ""}`}>{firstCol}</div>

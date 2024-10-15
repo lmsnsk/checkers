@@ -95,7 +95,7 @@ export const createRoom = (
       action: "to_room",
       nickname: data.nickname,
       userId: data.userId,
-      roomIdCounter,
+      roomId: roomIdCounter,
     })
   );
 };
@@ -113,7 +113,7 @@ export const joinRoom = (
 
   users.set(data.userId, { ws, inGame: true, nickname: data.nickname });
 
-  rooms[data.roomId - 1].playersInRoom.push({
+  currentRoom.playersInRoom.push({
     nickname: data.nickname,
     userId: data.userId,
     pieceType: "black",
