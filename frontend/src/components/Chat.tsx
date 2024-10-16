@@ -1,21 +1,25 @@
 import { FC, KeyboardEvent, useEffect, useRef, useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 
-import style from "./Chat.module.scss";
-
+import Preloader from "./Preloader";
+import ChatButton from "./ChatButton";
 import MessagesList from "./MessagesList";
+
+import backImg from "../assets/img/back.png";
 import emojiImg from "../assets/img/emoji.png";
 import sendImg from "../assets/img/send.png";
-import Preloader from "./Preloader";
 import { useCheckerStore } from "../store/store";
+
+import style from "./Chat.module.scss";
 
 interface ChatProps {
   fieldSize: number;
-  isVertical: boolean;
+  isChatOpened: boolean;
   sendChatMessage: (text: string) => void;
+  setIsChatOpened: (isChatOpened: boolean) => void;
 }
 
-const Chat: FC<ChatProps> = ({ fieldSize, sendChatMessage }) => {
+const Chat: FC<ChatProps> = ({ fieldSize, sendChatMessage, isChatOpened, setIsChatOpened }) => {
   const [inputMessage, setInputMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -91,6 +95,14 @@ const Chat: FC<ChatProps> = ({ fieldSize, sendChatMessage }) => {
         </div>
         {(!roomCreator || !roomGuest) && <Preloader />}
       </div>
+      {fieldSize < 600 && (
+        <ChatButton
+          img={backImg}
+          roomGuest={roomGuest}
+          isChatOpened={isChatOpened}
+          setIsChatOpened={setIsChatOpened}
+        />
+      )}
     </div>
   );
 };

@@ -13,11 +13,10 @@ const WH_OUT = "white";
 
 interface FiguresProps {
   fieldSize: number;
-  creator: boolean;
   gameState: GameState | undefined;
 }
 
-const Figures: FC<FiguresProps> = ({ fieldSize, gameState, creator }) => {
+const Figures: FC<FiguresProps> = ({ fieldSize, gameState }) => {
   const cellSize = fieldSize / 8;
   const checkerSize = cellSize * 0.8;
 

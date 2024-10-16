@@ -13,8 +13,13 @@
     justify-content: center;
     align-items: center;
 
-    .logo {
+    .logoBox {
       width: 100px;
+      height: 100px;
+
+      .logo {
+        width: 100%;
+      }
     }
 
     .title {
@@ -45,8 +50,10 @@
   .main {
     .head {
       gap: 16px;
-      .logo {
+
+      .logoBox {
         width: 70px;
+        height: 70px;
       }
       .title {
         .firstWord {

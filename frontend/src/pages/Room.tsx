@@ -2,13 +2,13 @@ import { FC, useEffect, useState } from "react";
 
 import Chat from "../components/Chat";
 import Field from "../components/Field";
-import chatImg from "../assets/img/chat.png";
-import backImg from "../assets/img/back.png";
+import ChatButton from "../components/ChatButton";
 import ConfirmWindow from "../components/ConfirmWindow";
 import { useCheckerStore } from "../store/store";
 
+import chatImg from "../assets/img/chat.png";
+import backImg from "../assets/img/back.png";
 import preloader from "../assets/img/ghost.gif";
-import logo from "../assets/img/log.svg";
 
 import style from "./Room.module.scss";
 
@@ -76,7 +76,6 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
     return (
       <>
         <div className={`${style.title} ${isVertical ? style.verticalTitle : ""}`}>
-          {/* <img src={logo} alt="logo" style={{ width: "40px", height: "40px" }} /> */}
           <button className={style.back} onClick={() => setConfirmWindow(true)}>
             <img src={backImg} alt="back" />
           </button>
@@ -99,7 +98,14 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
   };
 
   const showChat = () => {
-    return <Chat fieldSize={fieldSize} isVertical={isVertical} sendChatMessage={sendChatMessage} />;
+    return (
+      <Chat
+        fieldSize={fieldSize}
+        sendChatMessage={sendChatMessage}
+        isChatOpened={isChatOpened}
+        setIsChatOpened={setIsChatOpened}
+      />
+    );
   };
 
   const showField = () => {
@@ -121,13 +127,12 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
               <div className={`${style.chatBox} ${isChatOpened ? style.openedChatBox : ""}`}>
                 {showChat()}
               </div>
-              <button
-                disabled={roomGuest ? false : true}
-                className={style.button}
-                onClick={() => setIsChatOpened(!isChatOpened)}
-              >
-                <img className={style.img} src={isChatOpened ? backImg : chatImg} alt="chat" />
-              </button>
+              <ChatButton
+                img={chatImg}
+                roomGuest={roomGuest}
+                isChatOpened={isChatOpened}
+                setIsChatOpened={setIsChatOpened}
+              />
             </>
           ) : (
             <>

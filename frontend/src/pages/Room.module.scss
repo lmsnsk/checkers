@@ -1,9 +1,13 @@
 .main {
   width: 100vw;
+  height: 100vh;
+  padding-bottom: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 40px;
+  column-gap: 40px;
+  row-gap: 10px;
+  box-sizing: border-box;
 
   .leftSection {
     gap: 50px;
@@ -87,28 +91,11 @@
   .openedChatBox {
     left: 0;
   }
-
-  .button {
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    color: white;
-    background-color: transparent;
-    border: none;
-
-    &:focus {
-      outline: none;
-    }
-
-    .img {
-      width: 40px;
-      height: 40px;
-    }
-  }
 }
 
 .verticalMain {
   flex-direction: column;
+  justify-content: start;
 }
 
 @media (max-width: 768px) {

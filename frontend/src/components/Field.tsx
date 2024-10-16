@@ -48,8 +48,8 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
         style={
           fieldSize < 600
             ? {
-                height: "32px",
-                fontSize: "1.5rem",
+                height: "24px",
+                fontSize: "1rem",
                 gridTemplateColumns: "2rem 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 2rem",
               }
             : {}
@@ -66,7 +66,7 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
     return (
       <div
         className={`${style.asideStyle} ${style.marginColumn}`}
-        style={fieldSize < 600 ? { width: "32px", fontSize: "1.5rem" } : {}}
+        style={fieldSize < 600 ? { width: "24px", fontSize: "1rem" } : {}}
       >
         {marginColumn.map((row) => (
           <div key={row + keyAdd}>{row}</div>
@@ -90,11 +90,11 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
           {drawMarginColumn("left")}
           <div
             className={style.field}
-            style={{ height: fieldSize, width: fieldSize }}
+            style={{ height: `${fieldSize}px`, width: `${fieldSize}px` }}
             onClick={onClickHandler}
           >
             {drawField()}
-            <Figures gameState={gameState} fieldSize={fieldSize} creator={creator} />
+            <Figures gameState={gameState} fieldSize={fieldSize} />
           </div>
           {drawMarginColumn("right")}
         </div>

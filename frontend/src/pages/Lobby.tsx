@@ -23,7 +23,9 @@ const Lobby: FC<LobbyProps> = ({ joinRoom, createRoom }) => {
       {isLoading && (
         <main className={style.main}>
           <div className={style.head}>
-            <img className={style.logo} src={logo} alt="logo" />
+            <div className={style.logoBox}>
+              <img className={style.logo} src={logo} alt="logo" />
+            </div>
             <div className={style.title}>
               <span className={style.firstWord}>ШАШКИ</span>
               <span className={style.secondWord}>ОНЛАЙН</span>

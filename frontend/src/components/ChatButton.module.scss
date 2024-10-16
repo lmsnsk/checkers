@@ -1,0 +1,20 @@
+.button {
+  color: white;
+  background-color: transparent;
+  border: none;
+  transition: 0.1s;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+  }
+
+  .img {
+    width: 40px;
+    height: 40px;
+  }
+
+  &:active {
+    transform: scale(0.9);
+  }
+}
