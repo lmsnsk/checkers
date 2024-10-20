@@ -25,6 +25,7 @@ const ChatButton: FC<ChatButtonProps> = ({
     if (unreadMessages > 0 && isChatOpened) {
       setUnreadMessages(0);
     }
+    window.scrollTo(0, 0); // ! check!
     setIsChatOpened(!isChatOpened);
   };
 
