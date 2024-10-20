@@ -24,7 +24,7 @@ const closeConnection = (ws: WebSocket) => {
 };
 
 export const wssConnection = () => {
-  const wss = new WebSocketServer({ port: 8080, path: "/ws/checkers" });
+  const wss = new WebSocketServer({ port: 8888, path: "/ws/checkers" });
 
   wss.on("connection", (ws: WebSocket) => {
     onConnection(ws);
