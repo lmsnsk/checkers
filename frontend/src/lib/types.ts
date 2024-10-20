@@ -49,6 +49,7 @@ export interface GameState {
   checkers: Checker[];
   possibleTurns: PossibleTurns[];
   showPossibleTurns: boolean;
+  scores: { black: number; white: number };
 }
 
 export type Session = {

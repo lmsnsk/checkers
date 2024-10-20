@@ -201,6 +201,7 @@ const eatChecker = (gameState: GameState, checker: Checker, coord: Coord) => {
   else direction = "lb";
 
   gameState.kingEatDirection = direction;
+  checker.color === "white" ? gameState.scores.white++ : gameState.scores.black++;
 
   for (const enemy of gameState.enemiesForEat) {
     if (enemy.checkerId !== checker.id) continue;
@@ -259,6 +260,9 @@ export const checkPossibleMoves = (
         checker.canMove = true;
       }
     }
+  }
+  if (gameState.possibleTurnsAll.length === 0) {
+    gameState.winner = isCreator ? "guest" : "creator";
   }
 };
 

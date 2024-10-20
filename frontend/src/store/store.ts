@@ -15,6 +15,8 @@ interface State {
   gameState: GameState | undefined;
   winner: "creator" | "guest" | undefined;
   socket: WebSocket | undefined;
+  unreadMessages: number;
+  setUnreadMessages: (unreadMessages: number) => void;
   setRoomList: (roomList: RoomListItem[]) => void;
   setRoomChat: (roomChat: RoomChat[]) => void;
   setNickname: (nickname: string) => void;
@@ -42,6 +44,8 @@ export const useCheckerStore = create<State>()((set) => ({
   gameState: undefined,
   winner: undefined,
   socket: undefined,
+  unreadMessages: 0,
+  setUnreadMessages: (unreadMessages: number) => set({ unreadMessages }),
   setRoomList: (roomList: RoomListItem[]) => set({ roomList }),
   setRoomChat: (roomChat: RoomChat[]) => set({ roomChat }),
   setNickname: (nickname: string) => set({ nickname }),

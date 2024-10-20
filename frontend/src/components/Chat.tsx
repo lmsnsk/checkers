@@ -99,6 +99,7 @@ const Chat: FC<ChatProps> = ({ fieldSize, sendChatMessage, isChatOpened, setIsCh
         <ChatButton
           img={backImg}
           roomGuest={roomGuest}
+          showCounter={false}
           isChatOpened={isChatOpened}
           setIsChatOpened={setIsChatOpened}
         />

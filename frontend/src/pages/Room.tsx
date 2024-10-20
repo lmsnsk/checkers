@@ -101,8 +101,8 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
     return (
       <Chat
         fieldSize={fieldSize}
-        sendChatMessage={sendChatMessage}
         isChatOpened={isChatOpened}
+        sendChatMessage={sendChatMessage}
         setIsChatOpened={setIsChatOpened}
       />
     );
@@ -131,6 +131,7 @@ const Room: FC<RoomProps> = ({ sendChatMessage, sendCoordinates, leaveGame }) =>
                 img={chatImg}
                 roomGuest={roomGuest}
                 isChatOpened={isChatOpened}
+                showCounter={true}
                 setIsChatOpened={setIsChatOpened}
               />
             </>

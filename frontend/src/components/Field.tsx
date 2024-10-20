@@ -78,36 +78,53 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
   return (
     <>
       <div className={style.main}>
-        {roomCreator && roomGuest && (
-          <span className={style.enemyName}>{creator ? roomGuest : roomCreator}</span>
-        )}
-        {gameState &&
-          ((gameState.turn === "creator" && !creator) || (gameState.turn === "guest" && creator)) &&
-          roomGuest &&
-          roomCreator && <span className={style.enemyTurn}>Ход противника</span>}
-        {drawMarginRow("top")}
-        <div className={style.wrapper}>
-          {drawMarginColumn("left")}
-          <div
-            className={style.field}
-            style={{ height: `${fieldSize}px`, width: `${fieldSize}px` }}
-            onClick={onClickHandler}
-          >
-            {drawField()}
-            <Figures gameState={gameState} fieldSize={fieldSize} />
-          </div>
-          {drawMarginColumn("right")}
+        <div className={style.infoLine}>
+          {roomCreator && roomGuest && (
+            <div>
+              <span className={style.enemyText}>{creator ? roomGuest : roomCreator}</span>
+              <span className={style.enemyText}>
+                {`: ${creator ? gameState?.scores.black : gameState?.scores.white}`}
+              </span>
+            </div>
+          )}
+          {gameState &&
+            ((gameState.turn === "creator" && !creator) ||
+              (gameState.turn === "guest" && creator)) &&
+            roomGuest &&
+            roomCreator && <span className={style.enemyText}>Ход противника</span>}
         </div>
-        {drawMarginRow("bottom")}
-        {(!roomCreator || !roomGuest) && <div className={style.cloack}></div>}
-        {roomCreator && roomGuest && (
-          <span className={style.playerName}>{creator ? roomCreator : roomGuest}</span>
-        )}
-        {gameState &&
-          ((gameState!.turn === "creator" && creator) ||
-            (gameState!.turn === "guest" && !creator)) &&
-          roomGuest &&
-          roomCreator && <span className={style.youTurn}>Ваш ход</span>}
+        <div className={style.fieldBox}>
+          {drawMarginRow("top")}
+          <div className={style.wrapper}>
+            {drawMarginColumn("left")}
+            <div
+              className={style.field}
+              style={{ height: `${fieldSize}px`, width: `${fieldSize}px` }}
+              onClick={onClickHandler}
+            >
+              {drawField()}
+              <Figures gameState={gameState} fieldSize={fieldSize} />
+            </div>
+            {drawMarginColumn("right")}
+          </div>
+          {drawMarginRow("bottom")}
+          {(!roomCreator || !roomGuest) && <div className={style.cloack}></div>}
+        </div>
+        <div className={style.infoLine}>
+          {roomCreator && roomGuest && (
+            <div>
+              <span className={style.playerText}>{creator ? roomCreator : roomGuest}</span>
+              <span className={style.playerText}>
+                {`: ${creator ? gameState?.scores.white : gameState?.scores.black}`}
+              </span>
+            </div>
+          )}
+          {gameState &&
+            ((gameState!.turn === "creator" && creator) ||
+              (gameState!.turn === "guest" && !creator)) &&
+            roomGuest &&
+            roomCreator && <span className={style.playerText}>Ваш ход</span>}
+        </div>
         <EndGameMessage leaveGame={leaveGame} />
       </div>
     </>

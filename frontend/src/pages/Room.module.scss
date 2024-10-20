@@ -86,6 +86,7 @@
     overflow: hidden;
     transition: 0.3s;
     left: -3000px;
+    z-index: 5;
   }
 
   .openedChatBox {

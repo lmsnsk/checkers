@@ -79,6 +79,7 @@ export interface Session {
     possibleTurnsAll: PossibleTurns[];
     enemiesForEat: (Coord & { checkerId: number })[];
     showPossibleTurns: boolean;
+    scores: { black: number; white: number };
   };
   players: {
     creator: { ws: WebSocket; userId: number; nickname: string; pieceType: string };

@@ -8,13 +8,15 @@ import { Data, RoomI } from "./lib/types";
 import { useCheckerStore } from "./store/store";
 
 const App: FC = () => {
-  const { nickname, userId, creator, inGame, roomId, socket, setRoomId } = useCheckerStore();
+  const { nickname, userId, creator, inGame, roomId, socket, unreadMessages } = useCheckerStore();
   const { setUserId, setInGame, setRoomCreator, setRoomGuest, setWinner } = useCheckerStore();
   const { setGameState, setRoomList, setRoomChat, setNickname, setCreator } = useCheckerStore();
+  const { setRoomId, setUnreadMessages } = useCheckerStore();
 
   const [noServerConnection, setNoServerConnection] = useState(true);
 
-  const playSound = useSound("/checker.mp3");
+  const playSoundCheckerTurn = useSound("/checker.mp3");
+  const playSoundNewMessage = useSound("/incoming.mp3");
 
   useSocket(setNoServerConnection);
 
@@ -93,13 +95,17 @@ const App: FC = () => {
           break;
 
         case "chat_message":
-          if (data.chat) setRoomChat(data.chat);
+          if (data.chat) {
+            playSoundNewMessage();
+            setRoomChat(data.chat);
+            setUnreadMessages(unreadMessages + 1);
+          }
           break;
 
         case "game_state":
           if (data.gameState) {
             setGameState(data.gameState);
-            if (data.move) playSound();
+            if (data.move) playSoundCheckerTurn();
           }
           break;
 

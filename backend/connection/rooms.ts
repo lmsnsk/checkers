@@ -80,6 +80,7 @@ export const createRoom = (
       possibleTurns: [],
       possibleTurnsAll: [],
       showPossibleTurns: false,
+      scores: { black: 0, white: 0 },
     },
     players: {
       creator: { ws: ws, userId: data.userId, nickname: data.nickname, pieceType: "white" },
