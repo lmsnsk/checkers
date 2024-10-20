@@ -78,6 +78,7 @@ export const createRoom = (
       turn: "creator",
       checkers: startField(),
       possibleTurns: [],
+      possibleTurnsAll: [],
       showPossibleTurns: false,
     },
     players: {

@@ -60,6 +60,8 @@ const secondClickOnChecker = (
       addMove = checkerWithAddMove.isKing
         ? logic.checkFightKingMove(gameState, field, checkerWithAddMove, color, isCreator)
         : logic.checkFightMove(gameState, field, checkerWithAddMove, color, isCreator);
+
+      gameState.possibleTurns = [...gameState.possibleTurnsAll];
     }
 
     if (!addMove) {
@@ -81,7 +83,10 @@ const secondClickOnChecker = (
       logic.reverseCoordinates(session.gameState.checkers);
     }
     logic.checkWinner(gameState);
+
+    return true;
   }
+  return false;
 };
 
 export const coordinates = (ws: WebSocket, sessions: Session[], data: CoordinatesData) => {
@@ -98,11 +103,9 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
     }
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
-      if (!gameState.firstClickDone) {
-        firstClickOnChecker(ws, gameState, data);
-      } else {
-        secondClickOnChecker(ws, session, data, isCreator);
-      }
+      const isMoved = secondClickOnChecker(ws, session, data, isCreator);
+      isMoved || firstClickOnChecker(ws, gameState, data);
+
       if (gameState.winner) endGame(session);
     }
   });

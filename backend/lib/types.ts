@@ -76,7 +76,8 @@ export interface Session {
     firstClickCoords?: Coord;
     checkers: Checker[];
     possibleTurns: PossibleTurns[];
-    enemiesForEat: Coord[];
+    possibleTurnsAll: PossibleTurns[];
+    enemiesForEat: (Coord & { checkerId: number })[];
     showPossibleTurns: boolean;
   };
   players: {

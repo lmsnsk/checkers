@@ -21,7 +21,7 @@ const Figures: FC<FiguresProps> = ({ fieldSize, gameState }) => {
   const checkerSize = cellSize * 0.8;
 
   function showFigures(figures: GameState["checkers"] | GameState["possibleTurns"]) {
-    return figures.map((figure) => {
+    return figures.map((figure, index) => {
       const outerColor = figure.color === "black" ? BL_OUT : WH_OUT;
       const innerColor = figure.color === "black" ? BL_IN : WH_IN;
 
@@ -29,8 +29,8 @@ const Figures: FC<FiguresProps> = ({ fieldSize, gameState }) => {
       let isOpacity = false;
 
       if ("canMove" in figure && "isChosen" in figure) {
-        className = `${style.checker} ${figure.canMove ? style.canMove : ""} ${
-          figure.isChosen ? style.chosen : ""
+        className = `${style.checker} ${figure.isChosen ? style.chosen : ""} ${
+          figure.canMove ? style.canMove : ""
         }`;
       } else {
         className = style.checker;
@@ -39,7 +39,7 @@ const Figures: FC<FiguresProps> = ({ fieldSize, gameState }) => {
 
       return (
         <div
-          key={`checker-${figure.x}${figure.y}`}
+          key={`checker-${figure.x}${figure.y}-${index}`}
           className={className}
           style={{
             opacity: isOpacity ? 0.2 : 1,
