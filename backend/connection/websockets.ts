@@ -7,17 +7,40 @@ import { userIdGenerator } from "../lib/helpers";
 import { rooms, sessions, users } from "../database/database";
 
 const onConnection = (ws: WebSocket) => {
-  const currentUserId = userIdGenerator();
-  console.log(`Client id: ${currentUserId} connected`);
-  users.set(currentUserId, { ws, inGame: false });
-  ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
-  ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+  // const currentUserId = userIdGenerator();
+  // console.log(`Client id: ${currentUserId} connected`);
+  // users.set(currentUserId, { ws, inGame: false });
+  // ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
+  // ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+};
+
+const checkUser = (ws: WebSocket, userId: string) => {
+  let isUserExist = false;
+
+  users.forEach((user, key) => {
+    if (+userId === key) {
+      console.log(`Client id: ${key} connected. Reconnected`);
+      user.ws = ws;
+      user.ws.send(JSON.stringify({ action: "create_user", userId: key }));
+      user.ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+
+      isUserExist = true;
+    }
+  });
+
+  if (!isUserExist) {
+    const currentUserId = userIdGenerator();
+    console.log(`Client id: ${currentUserId} connected`);
+    users.set(currentUserId, { ws, inGame: false });
+    ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
+    ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));
+  }
 };
 
 const closeConnection = (ws: WebSocket) => {
   users.forEach((user, key) => {
     if (user.ws === ws) {
-      users.delete(key);
+      // users.delete(key);
       console.log(`Client id: ${key} disconnected`);
     }
   });
@@ -35,6 +58,9 @@ export const wssConnection = () => {
       console.log(data);
 
       switch (data.action) {
+        case "check_userId":
+          checkUser(ws, data.userId);
+          break;
         case "create_room":
           createRoom(ws, data, users, rooms, sessions);
           break;

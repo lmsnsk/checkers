@@ -3,15 +3,16 @@ import { FC, useEffect, useState } from "react";
 import Room from "./pages/Room";
 import Lobby from "./pages/Lobby";
 import ServerError from "./components/ServerError";
-import { useSocket, useSound } from "./lib/hooks";
 import { Data, RoomI } from "./lib/types";
 import { useCheckerStore } from "./store/store";
+import { useSocket, useSound } from "./lib/hooks";
+import { setToLocalStorage } from "./lib/utils";
 
 const App: FC = () => {
   const { nickname, userId, creator, inGame, roomId, socket, unreadMessages } = useCheckerStore();
-  const { setUserId, setInGame, setRoomCreator, setRoomGuest, setWinner } = useCheckerStore();
-  const { setGameState, setRoomList, setRoomChat, setNickname, setCreator } = useCheckerStore();
-  const { setRoomId, setUnreadMessages } = useCheckerStore();
+  const { setUserId, setInGame, setRoomCreator, setRoomGuest } = useCheckerStore();
+  const { setGameState, setRoomList, setRoomChat, setNickname } = useCheckerStore();
+  const { setRoomId, setUnreadMessages, setWinner, setCreator } = useCheckerStore();
 
   const [noServerConnection, setNoServerConnection] = useState(true);
 
@@ -74,7 +75,10 @@ const App: FC = () => {
           break;
 
         case "create_user":
-          setUserId(data.userId);
+          if (data.userId) {
+            setUserId(data.userId);
+            setToLocalStorage("userId_checkers_game", data.userId.toString());
+          }
           break;
 
         case "to_room":

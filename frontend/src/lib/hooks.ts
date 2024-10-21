@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCheckerStore } from "../store/store";
+import { getFromLocalStorage } from "./utils";
 
 export const useSocket = (setNoServerConnection: (noServerConnection: boolean) => void) => {
   const { socket, setSocket } = useCheckerStore();
@@ -8,9 +9,13 @@ export const useSocket = (setNoServerConnection: (noServerConnection: boolean) =
     // const newSocket = new WebSocket("ws://193.227.240.131:8888/ws/checkers");
     const newSocket = new WebSocket("ws://localhost:8888/ws/checkers");
     setSocket(newSocket);
+
+    const userId = getFromLocalStorage("userId_checkers_game");
+
     newSocket.onopen = () => {
       console.log("Подключение установлено");
       setNoServerConnection(false);
+      newSocket.send(JSON.stringify({ action: "check_userId", userId }));
     };
   }, [setSocket, setNoServerConnection]);
 

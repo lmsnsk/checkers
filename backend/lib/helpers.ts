@@ -1,6 +1,6 @@
 import { Checker, FigKind } from "./types";
 
-let userCounter = 0;
+let userCounter = 1;
 
 export const userIdGenerator = () => {
   return userCounter++;
