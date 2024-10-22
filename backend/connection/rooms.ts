@@ -119,7 +119,7 @@ export const joinRoom = (
   currentRoom.playersInRoom.push({
     nickname: data.nickname,
     userId: data.userId,
-    pieceType: "black",
+    pieceType: "black", // TODO: random
   });
 
   sessions.forEach((session) => {
