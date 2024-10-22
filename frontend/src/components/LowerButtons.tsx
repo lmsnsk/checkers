@@ -1,7 +1,5 @@
 import { FC, useState } from "react";
 
-import { useCheckerStore } from "../store/store";
-
 import style from "./LowerButtons.module.scss";
 
 interface LowerButtonsProps {
@@ -14,8 +12,6 @@ const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, joinRoom, createRoom 
   const [inputNickname, setInputNickname] = useState("");
   const [errorInput, setErrorInput] = useState(false);
 
-  const setCreator = useCheckerStore((state) => state.setCreator);
-
   const inputNicknameHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (inputNickname.length < 20) {
       setInputNickname(e.target.value);
@@ -26,7 +22,6 @@ const LowerButtons: FC<LowerButtonsProps> = ({ chosenRoom, joinRoom, createRoom 
   const createRoomHandler = () => {
     if (inputNickname && inputNickname.length > 2) {
       createRoom(inputNickname);
-      setCreator(true);
     } else {
       setErrorInput(true);
     }

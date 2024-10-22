@@ -82,9 +82,11 @@ const App: FC = () => {
           break;
 
         case "to_room":
-          if (data.nickname) {
+          if (data.nickname && data.creator) {
             setNickname(data.nickname);
             setRoomId(data.roomId);
+            setCreator(data.creator);
+            setUserId(data.userId);
           }
           setInGame(true);
           break;

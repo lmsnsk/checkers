@@ -98,6 +98,7 @@ export const createRoom = (
       nickname: data.nickname,
       userId: data.userId,
       roomId: roomIdCounter,
+      creator: true,
     })
   );
 };
@@ -141,6 +142,7 @@ export const joinRoom = (
       nickname: data.nickname,
       roomId: data.roomId,
       userId: data.userId,
+      creator: false,
     })
   );
 };
