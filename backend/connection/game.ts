@@ -83,7 +83,7 @@ const secondClickOnChecker = (
       logic.reverseCoordinates(session.gameState.checkers);
     }
     logic.checkWinner(gameState);
-    logic.resetCanMove(session.gameState.checkers);
+    // logic.resetCanMove(session.gameState.checkers);
 
     return true;
   }
