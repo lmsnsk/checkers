@@ -82,7 +82,7 @@ const App: FC = () => {
           break;
 
         case "to_room":
-          if (data.nickname && data.creator) {
+          if (data.nickname && data.creator !== undefined) {
             setNickname(data.nickname);
             setRoomId(data.roomId);
             setCreator(data.creator);

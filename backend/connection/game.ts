@@ -83,6 +83,7 @@ const secondClickOnChecker = (
       logic.reverseCoordinates(session.gameState.checkers);
     }
     logic.checkWinner(gameState);
+    logic.resetCanMove(session.gameState.checkers);
 
     return true;
   }
@@ -104,6 +105,7 @@ export const coordinates = (ws: WebSocket, sessions: Session[], data: Coordinate
 
     if (data.userId === creator.userId || (guest && data.userId === guest.userId)) {
       const isMoved = secondClickOnChecker(ws, session, data, isCreator);
+
       isMoved || firstClickOnChecker(ws, gameState, data);
 
       if (gameState.winner) endGame(session);
