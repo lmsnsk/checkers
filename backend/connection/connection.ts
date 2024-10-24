@@ -1,19 +1,10 @@
 import { WebSocket, WebSocketServer } from "ws";
 
 import { messages } from "./chat";
-import { checkUser } from "./users";
 import { coordinates, resetGame } from "./game";
+import { checkUser, closeConnection } from "./users";
 import { createRoom, deleteRoom, joinRoom } from "./rooms";
 import { rooms, sessions, users } from "../database/database";
-
-const closeConnection = (ws: WebSocket) => {
-  users.forEach((user, key) => {
-    if (user.ws === ws) {
-      // users.delete(key);
-      // console.log(`Client id: ${key} disconnected`);
-    }
-  });
-};
 
 export const wssConnection = () => {
   const wss = new WebSocketServer({ port: 8888, path: "/ws/checkers" });

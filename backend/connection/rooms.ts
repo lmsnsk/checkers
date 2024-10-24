@@ -53,7 +53,7 @@ export const createRoom = (
   rooms: Room[],
   sessions: Session[]
 ) => {
-  users.set(data.userId, { ws, inGame: true, nickname: data.nickname });
+  users.set(data.userId, { ws, inGame: true, nickname: data.nickname, isDisconnected: false });
 
   roomIdCounter++;
 
@@ -114,7 +114,7 @@ export const joinRoom = (
 
   if (currentRoom?.playersInRoom.length !== 1) return;
 
-  users.set(data.userId, { ws, inGame: true, nickname: data.nickname });
+  users.set(data.userId, { ws, inGame: true, nickname: data.nickname, isDisconnected: false });
 
   currentRoom.playersInRoom.push({
     nickname: data.nickname,

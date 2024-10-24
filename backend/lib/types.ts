@@ -25,7 +25,9 @@ export interface Room {
 export interface User {
   ws: WebSocket;
   inGame: boolean;
+  isDisconnected: boolean;
   nickname?: string;
+  timeoutId?: NodeJS.Timeout;
 }
 
 export interface PossibleTurns {

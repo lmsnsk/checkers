@@ -1,6 +1,6 @@
 const express = require("express");
 
-import { wssConnection } from "./connection/websockets";
+import { wssConnection } from "./connection/connection";
 
 const app = express();
 const PORT = process.env.PORT ?? 3001;
