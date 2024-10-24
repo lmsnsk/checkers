@@ -102,7 +102,7 @@ const App: FC = () => {
 
         case "chat_message":
           if (data.chat) {
-            playSoundNewMessage();
+            if (data.chat.at(-1)?.nickname !== nickname) playSoundNewMessage();
             setRoomChat(data.chat);
             setUnreadMessages(unreadMessages + 1);
           }
@@ -134,8 +134,6 @@ const App: FC = () => {
     if (socket) {
       socket.onclose = () => {
         console.log("Подключение прервано");
-        setNoServerConnection(true);
-        setTimeout(() => window.location.reload(), 3000);
       };
     }
     return () => socket?.close();
