@@ -6,8 +6,8 @@ export const useSocket = (setNoServerConnection: (noServerConnection: boolean) =
   const { socket, setSocket } = useCheckerStore();
 
   useEffect(() => {
-    // const newSocket = new WebSocket("ws://193.227.240.131:8888/ws/checkers");
-    const newSocket = new WebSocket("ws://localhost:8888/ws/checkers");
+    const newSocket = new WebSocket("ws://193.227.240.131:8888/ws/checkers");
+    // const newSocket = new WebSocket("ws://localhost:8888/ws/checkers");
     setSocket(newSocket);
 
     const userId = getFromLocalStorage("userId_checkers_game");
