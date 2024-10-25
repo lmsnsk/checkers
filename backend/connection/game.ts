@@ -77,7 +77,12 @@ const secondClickOnChecker = (
     if (!addMove) {
       logic.checkPossibleMoves(gameState, isCreator ? "black" : "white", !isCreator);
     }
-    sendGameState(oppositeWs, gameState, true);
+
+    sendGameState(
+      oppositeWs,
+      addMove ? { ...gameState, showPossibleTurns: false } : gameState,
+      true
+    );
 
     if (addMove) {
       logic.reverseCoordinates(session.gameState.checkers);

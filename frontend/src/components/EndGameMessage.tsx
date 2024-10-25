@@ -19,25 +19,21 @@ const EndGameMessage: FC<EndGameMessageProps> = ({ leaveGame }) => {
   };
 
   return (
-    <>
-      {winner && (
-        <div className={style.main}>
-          <div className={style.window}>
-            <h3>
-              {(winner === "creator" && creator) || (winner === "guest" && !creator)
-                ? "ПОБЕДА!"
-                : "ПОРАЖЕНИЕ"}
-            </h3>
-            <div className={style.buttons}>
-              <button onClick={() => leaveGame()}>ПОКИНУТЬ ИГРУ</button>
-              <button disabled={waitToRepeat} onClick={onRepeatGameHandler}>
-                {waitToRepeat ? "ОЖИДАЕМ . . ." : "СЫГРАТЬ ЕЩЕ"}
-              </button>
-            </div>
-          </div>
+    <div className={style.main}>
+      <div className={style.window}>
+        <h3>
+          {(winner === "creator" && creator) || (winner === "guest" && !creator)
+            ? "ПОБЕДА!"
+            : "ПОРАЖЕНИЕ"}
+        </h3>
+        <div className={style.buttons}>
+          <button onClick={() => leaveGame()}>ПОКИНУТЬ ИГРУ</button>
+          <button disabled={waitToRepeat} onClick={onRepeatGameHandler}>
+            {waitToRepeat ? "ОЖИДАЕМ . . ." : "СЫГРАТЬ ЕЩЕ"}
+          </button>
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 };
 

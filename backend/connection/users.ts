@@ -6,7 +6,7 @@ import { rooms, sessions, users } from "../database/database";
 import { checkPossibleMoves } from "../gameLogic/gameLogic";
 import { sendAllUsersRoomList } from "./rooms";
 
-const DELAY_RECONNECT_IN_MIN = 0.1;
+const DELAY_RECONNECT_IN_MIN = 10;
 
 const sendGameStateForReconnectUser = (session: Session, ws: WebSocket, isCreator: boolean) => {
   if (
@@ -79,7 +79,7 @@ export const checkUser = (ws: WebSocket, userId: string, sessions: Session[]) =>
 
   if (!isUserExist) {
     const currentUserId = userIdGenerator();
-    // console.log(`Client id: ${currentUserId} connected`);
+    console.log(`Client id: ${currentUserId} connected`);
     users.set(currentUserId, { ws, inGame: false, isDisconnected: false });
     ws.send(JSON.stringify({ action: "create_user", userId: currentUserId }));
     ws.send(JSON.stringify({ action: "room_list", rooms: rooms }));

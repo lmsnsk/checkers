@@ -22,7 +22,7 @@ export const resetChosen = (checkers: Checker[]): void => {
 
 export const reverseCoordinates = (checkers: Checker[]) => {
   for (const checker of checkers) {
-    checker.reverseCoordinates();
+    checker.reverseCoordinates!();
   }
 };
 
@@ -220,7 +220,7 @@ const eatChecker = (gameState: GameState, checker: Checker, coord: Coord) => {
 };
 
 const checkKing = (checker: Checker) => {
-  if (checker.y === 0) checker.becomeKing();
+  if (checker.y === 0) checker.becomeKing!();
 };
 
 export const checkPossibleMoves = (
@@ -314,7 +314,7 @@ export const move = (coord: Coord, gameState: GameState) => {
         gameState.kingEatDirection = undefined;
       }
 
-      checker.move(coord.x, coord.y);
+      checker.move!(coord.x, coord.y);
       checkKing(checker);
 
       gameState.possibleTurns = [];

@@ -50,16 +50,16 @@ export class Checker {
   canMove = false;
   isKing = false;
 
-  move(x: number, y: number) {
+  move?(x: number, y: number) {
     this.x = x;
     this.y = y;
   }
 
-  becomeKing() {
+  becomeKing?() {
     this.isKing = true;
   }
 
-  reverseCoordinates() {
+  reverseCoordinates?() {
     this.x = 7 - this.x;
     this.y = 7 - this.y;
   }

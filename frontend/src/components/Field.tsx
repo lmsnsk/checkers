@@ -20,7 +20,7 @@ interface FieldProps {
 }
 
 const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
-  const { userId, creator, roomCreator, roomGuest, gameState } = useCheckerStore();
+  const { userId, creator, roomCreator, roomGuest, gameState, winner } = useCheckerStore();
 
   const onClickHandler = (e: MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -125,7 +125,7 @@ const Field: FC<FieldProps> = ({ fieldSize, leaveGame, sendCoordinates }) => {
             roomGuest &&
             roomCreator && <span className={style.playerText}>Ваш ход</span>}
         </div>
-        <EndGameMessage leaveGame={leaveGame} />
+        {winner && <EndGameMessage leaveGame={leaveGame} />}
       </div>
     </>
   );
