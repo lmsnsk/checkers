@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useCheckerStore } from "../store/store";
 import { getFromLocalStorage } from "./utils";
 
-const url = "ws://193.227.240.131:8888/ws/checkers";
-// const url = "ws://localhost:8888/ws/checkers";
+// const url = "ws://193.227.240.131:8888/ws/checkers";
+const url = "ws://localhost:8888/ws/checkers";
 
 export const useSocket = (setNoServerConnection: (noServerConnection: boolean) => void) => {
   const { socket, setSocket } = useCheckerStore();
@@ -20,11 +20,6 @@ export const useSocket = (setNoServerConnection: (noServerConnection: boolean) =
       console.log("Подключение установлено");
       setNoServerConnection(false);
       newSocket.send(JSON.stringify({ action: "check_userId", userId }));
-    };
-
-    newSocket.onerror = () => {
-      setNoServerConnection(true);
-      setTimeout(() => window.location.reload(), 3000);
     };
   }, [setSocket, setNoServerConnection]);
 

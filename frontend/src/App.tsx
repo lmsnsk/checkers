@@ -3,35 +3,18 @@ import { FC, useEffect, useState } from "react";
 import Room from "./pages/Room";
 import Lobby from "./pages/Lobby";
 import ServerError from "./components/ServerError";
-import { Data, RoomI } from "./lib/types";
 import { useCheckerStore } from "./store/store";
-import { useSocket, useSound } from "./lib/hooks";
-import { setToLocalStorage } from "./lib/utils";
+import { useSocket } from "./lib/hooks";
+import Connection from "./components/Connection";
 
 const App: FC = () => {
-  const { nickname, userId, creator, inGame, roomId, socket, unreadMessages } = useCheckerStore();
-  const { setUserId, setInGame, setRoomCreator, setRoomGuest } = useCheckerStore();
-  const { setGameState, setRoomList, setRoomChat, setNickname } = useCheckerStore();
-  const { setRoomId, setUnreadMessages, setWinner, setCreator } = useCheckerStore();
+  const { nickname, userId, creator, inGame, roomId, socket } = useCheckerStore();
+  const { setInGame, setRoomCreator, setRoomGuest, setWinner } = useCheckerStore();
+  const { setGameState, setRoomChat, setNickname, setCreator } = useCheckerStore();
 
   const [noServerConnection, setNoServerConnection] = useState(true);
 
-  const playSoundCheckerTurn = useSound("/checker.mp3");
-  const playSoundNewMessage = useSound("/incoming.mp3");
-
   useSocket(setNoServerConnection);
-
-  const roomListSetter = (data: Data) => {
-    if (data.rooms) {
-      setRoomList(
-        data.rooms!.map((room: RoomI) => ({
-          roomId: room.roomId,
-          roomName: room.roomName,
-          playersInRoom: room.playersInRoom.length,
-        }))
-      );
-    }
-  };
 
   const createRoom = (nickname: string) => {
     socket?.send(JSON.stringify({ action: "create_room", nickname, userId }));
@@ -63,77 +46,12 @@ const App: FC = () => {
     }
   };
 
-  if (socket) {
-    socket.onmessage = (e) => {
-      const data: Data = JSON.parse(e.data);
-
-      console.log(data);
-
-      switch (data.action) {
-        case "room_list":
-          roomListSetter(data);
-          break;
-
-        case "create_user":
-          if (data.userId) {
-            setUserId(data.userId);
-            setToLocalStorage("userId_checkers_game", data.userId.toString());
-          }
-          break;
-
-        case "to_room":
-          if (data.nickname && data.creator !== undefined) {
-            setNickname(data.nickname);
-            setRoomId(data.roomId);
-            setCreator(data.creator);
-            setUserId(data.userId);
-          }
-          setInGame(true);
-          break;
-
-        case "current_session":
-          if (data.session) {
-            setWinner(undefined);
-            setRoomCreator(data.session.players.creator.nickname);
-            setRoomGuest(data.session.players.guest?.nickname ?? "");
-            setGameState(data.session.gameState);
-          }
-          break;
-
-        case "chat_message":
-          if (data.chat) {
-            if (data.chat.at(-1)?.nickname !== nickname) playSoundNewMessage();
-            setRoomChat(data.chat);
-            setUnreadMessages(unreadMessages + 1);
-          }
-          break;
-
-        case "game_state":
-          if (data.gameState) {
-            setGameState(data.gameState);
-            if (data.move) playSoundCheckerTurn();
-          }
-          break;
-
-        case "end_game":
-          if (data.winner) setWinner(data.winner);
-          break;
-
-        case "delete_room":
-          if (data.roomId === roomId) setInGame(false);
-          break;
-
-        case "check_game": // reconnect
-          if (data.inGame) setInGame(true);
-          break;
-      }
-    };
-  }
-
   useEffect(() => {
     if (socket) {
       socket.onclose = () => {
         console.log("Подключение прервано");
+        setNoServerConnection(true);
+        setTimeout(() => window.location.reload(), 3000);
       };
     }
     return () => socket?.close();
@@ -141,6 +59,7 @@ const App: FC = () => {
 
   return (
     <>
+      <Connection />
       {inGame ? (
         <Room
           sendChatMessage={sendChatMessage}
