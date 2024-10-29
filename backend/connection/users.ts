@@ -7,6 +7,7 @@ import { checkPossibleMoves } from "../gameLogic/gameLogic";
 import { sendAllUsersRoomList } from "./rooms";
 
 const DELAY_RECONNECT_IN_MIN = 10;
+const MILISECONDS_IN_MIN = 60000;
 
 const sendGameStateForReconnectUser = (session: Session, ws: WebSocket, isCreator: boolean) => {
   if (
@@ -96,7 +97,7 @@ export const closeConnection = (ws: WebSocket) => {
       let sessionIndex: number;
 
       user.timeoutId = setTimeout(() => {
-        sessions.forEach((session, index) => {
+        sessions?.forEach((session, index) => {
           if (session.players.creator.userId === key || session.players.guest?.userId === key) {
             const isCreator = session.players.creator.userId === key;
             sessionIndex = index;
@@ -119,7 +120,7 @@ export const closeConnection = (ws: WebSocket) => {
         sendAllUsersRoomList(users, rooms);
 
         console.log(`Client id: ${key} deleted`);
-      }, DELAY_RECONNECT_IN_MIN * 60 * 1000);
+      }, DELAY_RECONNECT_IN_MIN * MILISECONDS_IN_MIN);
 
       console.log(`Client id: ${key} in pending...`);
     } else {
